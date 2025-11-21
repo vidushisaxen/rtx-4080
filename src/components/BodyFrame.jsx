@@ -4,9 +4,9 @@ import React from 'react'
 const BodyFrame = () => {
   return (
     <>
-    <div className="relative z-9999 w-screen h-full">
+    <div className="relative z-9999  w-screen pointer-events-none h-full">
       {/* Fixed full-screen image background */}
-      <div className='w-full h-full'>
+      <div className='w-full bg-black h-full'>
       <Image
         src="/assets/icons/body-frame.svg"
         alt="Background"
