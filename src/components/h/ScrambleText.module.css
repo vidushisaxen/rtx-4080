@@ -1,0 +1,29 @@
+.container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.realText {
+  display: inline-block;
+  letter-spacing: 0.01em;
+}
+
+.charLowercase {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-transform: lowercase;
+  will-change: opacity, color, transform;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.realText:hover span {
+    color: #fff;
+}

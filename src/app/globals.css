@@ -40,3 +40,13 @@ h4 {
   margin-left: auto;
   margin-right: auto;
 }
+.btn-clipPath {
+  clip-path: polygon(
+    100% 0%,
+    100% 2.9vw,
+    11.25vw 100%,
+    0% 100%,
+    0% 1.4vw,
+    1.3vw 0%
+  );
+}
