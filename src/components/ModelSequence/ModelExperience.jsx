@@ -12,11 +12,12 @@ export default function ModelExperience({
   setCameraAngle,
   fanRotationRef,
   toggleFanRotation,
+  setPopUpToggler,
   ...props
 }) {
   const groupRef = useRef();
   gsap.registerPlugin(ScrollTrigger);
-  const { nodes, materials } = useGLTF("/rtx4090.glb");
+  const { nodes, materials } = useGLTF("/assets/models/rtx4090.glb");
 
   const { camera } = useThree();
 
@@ -58,13 +59,19 @@ export default function ModelExperience({
         end: "14.2% top",
         scrub: true,
         markers: false,
+        onEnter: () => {
+          toggleFanRotation(true);
+        },
+        onleaveback: () => {
+          toggleFanRotation(false);
+        },
       },
     });
 
     timeline1.to(groupRef.current.rotation, {
       x: degToRad(30),
       y: degToRad(-15),
-      ease: "power2.inOut",
+      ease: "power1.inOut",
     });
 
     return () => {
@@ -82,6 +89,12 @@ export default function ModelExperience({
         end: "28.5% top",
         scrub: true,
         markers: false,
+        onEnter: () => {
+          setPopUpToggler(true);
+        },
+        onLeave: () => {
+          setPopUpToggler(false);
+        },
       },
     });
 
@@ -90,7 +103,7 @@ export default function ModelExperience({
       x: 0,
       y: 0,
       z: 3.5,
-      ease: "power2.inOut",
+      ease: "power1.inOut",
     });
 
     // Animate model rotation with slight delay to prevent stretching
@@ -99,7 +112,7 @@ export default function ModelExperience({
       {
         x: degToRad(33),
         y: degToRad(37),
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -109,7 +122,7 @@ export default function ModelExperience({
       groupRef.current.position,
       {
         x: 1.55,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -127,7 +140,7 @@ export default function ModelExperience({
         start: "28.5% top",
         end: "42.8% top",
         scrub: true,
-        markers: true,
+        markers: false,
       },
     });
 
@@ -136,7 +149,7 @@ export default function ModelExperience({
       x: 0,
       y: 0,
       z: 5.5,
-      ease: "power2.inOut",
+      ease: "power1.inOut",
     });
 
     // Animate model rotation with slight delay
@@ -146,7 +159,7 @@ export default function ModelExperience({
         x: degToRad(37),
         y: degToRad(-30),
         z: degToRad(-10),
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -158,7 +171,7 @@ export default function ModelExperience({
         x: -1.7,
         y: -0.5,
         z: 0.35,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -176,14 +189,14 @@ export default function ModelExperience({
         start: "42.8% top",
         end: "57.1% top",
         scrub: true,
-        markers: true,
+        markers: false,
       },
     });
 
     // Animate camera position smoothly
     timeline4.to(camera.position, {
       z: 4.5,
-      ease: "power2.inOut",
+      ease: "power1.inOut",
     });
 
     // Animate model rotation with slight delay
@@ -193,7 +206,7 @@ export default function ModelExperience({
         y: degToRad(-140),
         z: 0,
         x: degToRad(38),
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -205,7 +218,7 @@ export default function ModelExperience({
         x: -0.7,
         y: -1.2,
         z: 0.35,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -234,7 +247,7 @@ export default function ModelExperience({
         y: degToRad(-100),
         x: degToRad(30),
         Z: degToRad(80),
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -245,7 +258,7 @@ export default function ModelExperience({
       {
         x: -2,
         y: -1.8,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0.1
     );
@@ -265,6 +278,61 @@ export default function ModelExperience({
         end: "85.7% top",
         scrub: true,
         markers: false,
+        onLeave: () => {
+          toggleFanRotation(false);
+        },
+        onEnterBack: () => {
+          toggleFanRotation(true);
+        },
+      },
+    });
+    // Animate model rotation with slight delay
+    timeline6.to(
+      groupRef.current.rotation,
+      {
+        y: degToRad(-20),
+        x: degToRad(30),
+        z: degToRad(-10),
+        ease: "power1.inOut",
+      },
+      0.1
+    );
+    timeline6.to(
+      camera.position,
+      {
+        x: 0,
+        y: 0,
+        z: 6,
+        ease: "power1.inOut",
+      },
+      0.1
+    );
+    // Animate model position with same timing
+    timeline6.to(
+      groupRef.current.position,
+      {
+        x: -3,
+        y: 0.2,
+        ease: "power1.inOut",
+      },
+      0.1
+    );
+
+    return () => {
+      timeline6.kill();
+    };
+  }, [camera]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !groupRef.current) return;
+
+    const timeline6 = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#model-sequence",
+        start: "85.7% top",
+        end: "100% bottom",
+        scrub: true,
+        markers: false,
       },
     });
 
@@ -275,7 +343,7 @@ export default function ModelExperience({
         x: 0,
         y: 0,
         z: 15,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0
     );
@@ -287,7 +355,7 @@ export default function ModelExperience({
         x: 0,
         y: 0,
         z: 0,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0
     );
@@ -299,7 +367,7 @@ export default function ModelExperience({
         x: 0,
         y: 0,
         z: 0,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0
     );
@@ -311,72 +379,13 @@ export default function ModelExperience({
         x: 0,
         y: -1,
         z: 0,
-        ease: "power2.inOut",
+        ease: "power1.inOut",
       },
       0
     );
 
     return () => {
       timeline6.kill();
-    };
-  }, [camera]);
-
-  
-  useEffect(() => {
-    if (typeof window === "undefined" || !groupRef.current) return;
-
-    const timeline7 = gsap.timeline({
-      scrollTrigger: {
-        trigger: "#model-sequence",
-        start: "85.7% top",
-        end: "100% top",
-        scrub: true,
-        markers: false,
-      },
-    });
-    timeline7.to(
-      groupRef.current.rotation,
-      {
-        y: 0,
-        x: 0,
-        z: 0,
-        ease: "power2.inOut",
-      },
-      0.1
-    );
-    timeline7.to(
-      camera.rotation,
-      {
-        x: 0,
-        y: 0,
-        z: 0,
-        ease: "power2.inOut",
-      },
-      0.1
-    );
-    timeline7.to(
-      camera.position,
-      {
-        x: 0,
-        y: 0,
-        z: 15,
-        ease: "power2.inOut",
-      },
-      0.1
-    );
-    timeline7.to(
-      groupRef.current.position,
-      {
-        x: 0,
-        y: -1,
-        z: 0,
-        ease: "power2.inOut",
-      },
-      0.1
-    );
-
-    return () => {
-      timeline7.kill();
     };
   }, [camera]);
 

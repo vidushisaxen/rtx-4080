@@ -1,12 +1,15 @@
 "use client";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense, useRef, useLayoutEffect, useState } from "react";
-import { Center, Environment } from "@react-three/drei";
+import { Center, Effects, Environment } from "@react-three/drei";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ModelExperience from "./ModelExperience";
 import FallBackLoader from "./FallBackLoader";
 import { degToRad } from "three/src/math/MathUtils";
+import FixedGrid from "../Grid/FixedGrid";
+import InfoPopup from "../InfoPopup";
+import InfoPopupsForSequence from "./InfoPopupsForSequence";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -20,6 +23,7 @@ export default function ModelSequence() {
     z: 5,
   });
   const fanRotationRef = useRef(null);
+  const [popUpToggler, setPopUpToggler] = useState(false);
 
   const toggleFanRotation = (value) => {
     if (!fanRotationRef.current) return;
@@ -52,7 +56,10 @@ export default function ModelSequence() {
       className="h-[1400vh] w-full  relative"
     >
       <div className="h-screen w-full bg-black sticky top-0">
-        <p className="text-white  text-[20vw] font-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <FixedGrid />
+        <InfoPopupsForSequence popUpToggler={popUpToggler} setPopUpToggler={setPopUpToggler} />
+
+        <p className="text-white z-[11] text-[20.4vw] font-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           GEFORCE
         </p>
         <Canvas
@@ -69,17 +76,21 @@ export default function ModelSequence() {
             aspect: window.innerWidth / window.innerHeight,
           }}
           dpr={[1, 2]}
-          className="h-screen w-full"
+          className="h-screen relative z-[12] w-full"
           shadows
           flat
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
           <ambientLight intensity={0.5} />
-          <Environment preset="studio" environmentRotation={[-Math.PI / 4, 0, 0]} environmentIntensity={1} />
+          <Environment
+            preset="studio"
+            environmentRotation={[-Math.PI / 4, 0, 0]}
+            environmentIntensity={1}
+          />
           <Suspense fallback={<FallBackLoader />}>
-          
             <Center>
               <ModelExperience
+                setPopUpToggler={setPopUpToggler}
                 toggleFanRotation={toggleFanRotation}
                 cameraAngle={cameraAngle}
                 setCameraAngle={setCameraAngle}
@@ -88,7 +99,6 @@ export default function ModelSequence() {
               />
             </Center>
           </Suspense>
-         
         </Canvas>
       </div>
     </div>

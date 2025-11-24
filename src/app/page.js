@@ -4,6 +4,7 @@ import FixedGrid from "@/components/Grid/FixedGrid";
 import Header from "@/components/Header";
 import HeroBackground from "@/components/HeroBackground";
 import HeroCopy from "@/components/HeroCopy";
+import InfoPopup from "@/components/InfoPopup";
 import ModelSequence from "@/components/ModelSequence/ModelSequence";
 import React from "react";
 
