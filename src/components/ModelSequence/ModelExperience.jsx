@@ -86,7 +86,7 @@ export default function ModelExperience({
         start: "14.2% top",
         end: "28.5% top",
         scrub: true,
-        markers: true,
+        // markers: true,
         // snap: {
         //   snapTo: [0,1],
 

@@ -71,7 +71,6 @@ export default function ModelSequence() {
             fov: 40,
             near: 0.1,
             far: 1000,
-            aspect: window.innerWidth / window.innerHeight,
           }}
           dpr={[1, 2]}
           className="h-screen relative z-[12] w-full"
