@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { useGLTF, useAnimations } from "@react-three/drei";
+import { useGLTF, useAnimations, useTexture } from "@react-three/drei";
 import { degToRad } from "three/src/math/MathUtils";
 import { useThree } from "@react-three/fiber";
-import { Vector3 } from "three";
-
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
@@ -12,7 +10,6 @@ export default function ModelExperience({
   setCameraAngle,
   fanRotationRef,
   toggleFanRotation,
-  setPopUpToggler,
   ...props
 }) {
   const groupRef = useRef();
@@ -59,12 +56,13 @@ export default function ModelExperience({
         end: "14.2% top",
         scrub: true,
         markers: false,
-        onEnter: () => {
-          toggleFanRotation(true);
-        },
-        onleaveback: () => {
-          toggleFanRotation(false);
-        },
+       
+       onEnter: () => {
+        toggleFanRotation(true);
+       },
+       onleave: () => {
+        toggleFanRotation(false);
+       },
       },
     });
 
@@ -88,13 +86,13 @@ export default function ModelExperience({
         start: "14.2% top",
         end: "28.5% top",
         scrub: true,
-        markers: false,
-        onEnter: () => {
-          setPopUpToggler(true);
-        },
-        onLeave: () => {
-          setPopUpToggler(false);
-        },
+        markers: true,
+        // snap: {
+        //   snapTo: [0,1],
+
+        //   ease: "power1.inOut",
+        // },
+       
       },
     });
 
@@ -389,6 +387,12 @@ export default function ModelExperience({
     };
   }, [camera]);
 
+  const mainMaterialBaseColor = useTexture(
+    "/assets/models/textures/main_material_baseColor.png"
+  );
+  const mainMaterialEmissive = useTexture(
+    "/assets/models/textures/main_material_emissive.png"
+  );
   return (
     <group
       {...props}
@@ -472,7 +476,7 @@ export default function ModelExperience({
                   receiveShadow
                   geometry={nodes.Plastic_Cover_main_material_0.geometry}
                   material={materials.main_material}
-                />
+                ></mesh>
               </group>
               <group
                 position={[-300.001, 0, 0]}

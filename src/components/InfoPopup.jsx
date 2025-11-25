@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
+import { useLenis } from "lenis/react";
 
 export default function InfoPopup({
   isOpen = true,
@@ -11,7 +12,7 @@ export default function InfoPopup({
   const containerRef = useRef(null);
   const textWrapperRef = useRef(null);
   const [internalOpen, setInternalOpen] = useState(false);
-
+  const lenis = useLenis();
   const getTransformOrigin = () => {
     switch (origin) {
       case "top-left":
@@ -28,7 +29,7 @@ export default function InfoPopup({
 
   const animateOpen = () => {
     if (!containerRef.current || !textWrapperRef.current) return;
-
+    lenis.stop();
     const tl = gsap.timeline();
 
     // Set initial states
@@ -43,16 +44,17 @@ export default function InfoPopup({
     // Animate container scale with smoother easing
     tl.to(containerRef.current, {
       scale: 1,
-      duration: 0.8,
+      duration: 0.3,
       ease: "power2.out",
     });
 
     // Animate text wrapper with smooth fade and slide
     tl.to(textWrapperRef.current, {
       opacity: 1,
-      duration: 0.6,
+      duration: 0.4,
       ease: "power2.out",
       delay: 0.5,
+      onComplete: () => lenis.start(),
     }, "-=0.4");
 
     setInternalOpen(true);
@@ -60,7 +62,6 @@ export default function InfoPopup({
 
   const animateClose = () => {
     if (!containerRef.current || !textWrapperRef.current) return;
-
     const tl = gsap.timeline({
       onComplete: () => setInternalOpen(false),
     });
@@ -98,18 +99,18 @@ export default function InfoPopup({
   return (
     <div
       ref={containerRef}
-      className="relative w-[25vw] h-fit min-h-[10vh] bg-white/20 border border-white/20 backdrop-blur-sm z-[200]"
+      className="relative w-[25vw] h-fit min-h-[10vh] bg-black/10 border border-[#5cffa3]/20 backdrop-blur-xl z-[200]"
       style={{ scale: 0 }}
     >
       <div className="absolute inset-0">
-        <div className="w-[3px] h-[3px] bg-white absolute top-[4px] left-[4px]"></div>
-        <div className="w-[3px] h-[3px] bg-white absolute top-[4px] right-[4px]"></div>
-        <div className="w-[3px] h-[3px] bg-white absolute bottom-[4px] left-[4px]"></div>
-        <div className="w-[3px] h-[3px] bg-white absolute bottom-[4px] right-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute top-[4px] left-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute top-[4px] right-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute bottom-[4px] left-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute bottom-[4px] right-[4px]"></div>
       </div>
       <div
         ref={textWrapperRef}
-        className="relative z-[2] h-full w-full bg-primary-1/10 p-[2vw] space-y-[1vw]"
+        className="relative z-[2] h-full w-full bg-black/10 p-[2vw] space-y-[1vw]"
         style={{ opacity: 0 }}
       >
         <p className="text-[4vw] leading-[1]" >{title}</p>

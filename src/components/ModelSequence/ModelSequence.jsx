@@ -1,7 +1,7 @@
 "use client";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense, useRef, useLayoutEffect, useState } from "react";
-import { Center, Effects, Environment } from "@react-three/drei";
+import { Center, Effects, Environment, Sparkles } from "@react-three/drei";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ModelExperience from "./ModelExperience";
@@ -10,6 +10,7 @@ import { degToRad } from "three/src/math/MathUtils";
 import FixedGrid from "../Grid/FixedGrid";
 import InfoPopup from "../InfoPopup";
 import InfoPopupsForSequence from "./InfoPopupsForSequence";
+import Image from "next/image";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -23,7 +24,7 @@ export default function ModelSequence() {
     z: 5,
   });
   const fanRotationRef = useRef(null);
-  const [popUpToggler, setPopUpToggler] = useState(false);
+
 
   const toggleFanRotation = (value) => {
     if (!fanRotationRef.current) return;
@@ -56,17 +57,14 @@ export default function ModelSequence() {
       className="h-[1400vh] w-full  relative"
     >
       <div className="h-screen w-full bg-black sticky top-0">
-        <FixedGrid />
-        <InfoPopupsForSequence popUpToggler={popUpToggler} setPopUpToggler={setPopUpToggler} />
-
-        <p className="text-white z-[11] text-[20.4vw] font-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          GEFORCE
-        </p>
+        <InfoPopupsForSequence />
         <Canvas
           gl={{
             antialias: true,
             alpha: true,
             preserveDrawingBuffer: true,
+            toneMapping: 0,
+            toneMappingExposure: 1,
           }}
           camera={{
             position: [0, 0, 15],
@@ -81,16 +79,37 @@ export default function ModelSequence() {
           flat
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
+          <Sparkles
+            count={100}
+            scale={[15, 15, 1]}
+            size={10}
+            speed={0.4}
+            opacity={0.3}
+            color="#5cffa3"
+            position={[0, 0, 0]}
+          />
           <ambientLight intensity={0.5} />
+          <directionalLight
+            position={[0, -10, 0]}
+            intensity={2}
+            color="#5cffa3"
+            // castShadow
+          />
+          <directionalLight
+            position={[0, 10, 0]}
+            intensity={5}
+            color="#5cffa3"
+          />
+
           <Environment
             preset="studio"
             environmentRotation={[-Math.PI / 4, 0, 0]}
             environmentIntensity={1}
           />
+
           <Suspense fallback={<FallBackLoader />}>
             <Center>
               <ModelExperience
-                setPopUpToggler={setPopUpToggler}
                 toggleFanRotation={toggleFanRotation}
                 cameraAngle={cameraAngle}
                 setCameraAngle={setCameraAngle}
@@ -99,6 +118,12 @@ export default function ModelSequence() {
               />
             </Center>
           </Suspense>
+          <directionalLight
+            position={[0, 15, 2]}
+            intensity={20}
+            color="#5cffa3"
+            target-position={[0, -1, 0]}
+          />
         </Canvas>
       </div>
     </div>
