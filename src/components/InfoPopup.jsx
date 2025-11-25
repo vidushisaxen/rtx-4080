@@ -29,7 +29,7 @@ export default function InfoPopup({
 
   const animateOpen = () => {
     if (!containerRef.current || !textWrapperRef.current) return;
-    lenis.stop();
+    // lenis.stop();
     const tl = gsap.timeline();
 
     // Set initial states
@@ -54,7 +54,7 @@ export default function InfoPopup({
       duration: 0.4,
       ease: "power2.out",
       delay: 0.5,
-      onComplete: () => lenis.start(),
+      // onComplete: () => lenis.start(),
     }, "-=0.4");
 
     setInternalOpen(true);

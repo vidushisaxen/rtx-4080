@@ -1,18 +1,19 @@
 "use client";
 import { Canvas } from "@react-three/fiber";
-import React, { Suspense, useRef, useLayoutEffect, useState } from "react";
-import { Center, Effects, Environment, Sparkles } from "@react-three/drei";
+import React, {
+  Suspense,
+  useRef,
+  useLayoutEffect,
+  useState,
+  useEffect,
+} from "react";
+import { Center, Effects, Environment, OrbitControls, Sparkles } from "@react-three/drei";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ModelExperience from "./ModelExperience";
 import FallBackLoader from "./FallBackLoader";
-import { degToRad } from "three/src/math/MathUtils";
-import FixedGrid from "../Grid/FixedGrid";
-import InfoPopup from "../InfoPopup";
 import InfoPopupsForSequence from "./InfoPopupsForSequence";
-import Image from "next/image";
-
-// Register ScrollTrigger plugin
+import { DepthOfField, EffectComposer } from "@react-three/postprocessing";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ModelSequence() {
@@ -24,8 +25,6 @@ export default function ModelSequence() {
     z: 5,
   });
   const fanRotationRef = useRef(null);
-
-
   const toggleFanRotation = (value) => {
     if (!fanRotationRef.current) return;
 
@@ -49,12 +48,11 @@ export default function ModelSequence() {
       });
     }
   };
-
   return (
     <div
       id="model-sequence"
       ref={containerRef}
-      className="h-[1400vh] w-full  relative"
+      className="h-[2500vh] w-full  relative"
     >
       <div className="h-screen w-full bg-black sticky top-0">
         <InfoPopupsForSequence />
@@ -87,8 +85,8 @@ export default function ModelSequence() {
             color="#5cffa3"
             position={[0, 0, 0]}
           />
-          <ambientLight intensity={0.5} />
-          <directionalLight
+          {/* <ambientLight intensity={0.1} /> */}
+          {/* <directionalLight
             position={[0, -10, 0]}
             intensity={2}
             color="#5cffa3"
@@ -98,7 +96,7 @@ export default function ModelSequence() {
             position={[0, 10, 0]}
             intensity={5}
             color="#5cffa3"
-          />
+          /> */}
 
           <Environment
             preset="studio"
@@ -117,6 +115,8 @@ export default function ModelSequence() {
               />
             </Center>
           </Suspense>
+          {/* <OrbitControls /> */}
+          {/* MAINLIGHT */}
           <directionalLight
             position={[0, 15, 2]}
             intensity={20}

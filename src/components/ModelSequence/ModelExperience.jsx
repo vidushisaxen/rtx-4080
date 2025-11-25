@@ -14,7 +14,8 @@ export default function ModelExperience({
 }) {
   const groupRef = useRef();
   gsap.registerPlugin(ScrollTrigger);
-  const { nodes, materials } = useGLTF("/assets/models/rtx4090.glb");
+  const { nodes, materials } = useGLTF("/assets/models/model.glb");
+  console.log(nodes, nodes.Plastic_Cover_main_material_0.geometry);
 
   const { camera } = useThree();
 
@@ -53,16 +54,16 @@ export default function ModelExperience({
       scrollTrigger: {
         trigger: "#model-sequence",
         start: "top top",
-        end: "14.2% top",
+        end: "5% top",
         scrub: true,
         markers: false,
-       
-       onEnter: () => {
-        toggleFanRotation(true);
-       },
-       onleave: () => {
-        toggleFanRotation(false);
-       },
+
+        onEnter: () => {
+          toggleFanRotation(true);
+        },
+        onleave: () => {
+          toggleFanRotation(false);
+        },
       },
     });
 
@@ -83,16 +84,10 @@ export default function ModelExperience({
     const timeline2 = gsap.timeline({
       scrollTrigger: {
         trigger: "#model-sequence",
-        start: "14.2% top",
+        start: "5% top",
         end: "28.5% top",
         scrub: true,
-        // markers: true,
-        // snap: {
-        //   snapTo: [0,1],
-
-        //   ease: "power1.inOut",
-        // },
-       
+        markers: false,
       },
     });
 
@@ -387,12 +382,6 @@ export default function ModelExperience({
     };
   }, [camera]);
 
-  const mainMaterialBaseColor = useTexture(
-    "/assets/models/textures/main_material_baseColor.png"
-  );
-  const mainMaterialEmissive = useTexture(
-    "/assets/models/textures/main_material_emissive.png"
-  );
   return (
     <group
       {...props}
@@ -405,30 +394,7 @@ export default function ModelExperience({
         <group rotation={[Math.PI / 2, 0, 0]} scale={0.01}>
           <group>
             <group>
-              <group
-                position={[-300, 0, 0]}
-                rotation={[-Math.PI / 2, 0, 0]}
-                scale={100}
-              >
-                <mesh
-                  castShadow
-                  receiveShadow
-                  geometry={nodes.PCB_main_material_0.geometry}
-                  material={materials.main_material}
-                />
-              </group>
-              <group
-                position={[-300, 0, 0]}
-                rotation={[-Math.PI / 2, 0, 0]}
-                scale={100}
-              >
-                <mesh
-                  castShadow
-                  receiveShadow
-                  geometry={nodes.VRM_main_material_0.geometry}
-                  material={materials.main_material}
-                />
-              </group>
+             
               <group
                 position={[-300, 0, 0]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -475,6 +441,12 @@ export default function ModelExperience({
                   castShadow
                   receiveShadow
                   geometry={nodes.Plastic_Cover_main_material_0.geometry}
+                  material={materials.main_material}
+                ></mesh>
+                <mesh
+                  castShadow
+                  receiveShadow
+                  geometry={nodes.Plastic_Cover_main_material_0001.geometry}
                   material={materials.main_material}
                 ></mesh>
               </group>
@@ -526,6 +498,9 @@ export default function ModelExperience({
                   material={materials.radiator_3}
                 />
               </group>
+
+
+              {/* EXTRAS */}
               <group
                 position={[-300, 0, 0]}
                 rotation={[-Math.PI / 2, 0, 0]}
@@ -547,6 +522,32 @@ export default function ModelExperience({
                   castShadow
                   receiveShadow
                   geometry={nodes.Fan_Holders_main_material_0.geometry}
+                  material={materials.main_material}
+                />
+              </group>
+
+
+               <group
+                position={[-300, 0, 0]}
+                rotation={[-Math.PI / 2, 0, 0]}
+                scale={100}
+              >
+                <mesh
+                  castShadow
+                  receiveShadow
+                  geometry={nodes.PCB_main_material_0.geometry}
+                  material={materials.main_material}
+                />
+              </group>
+              <group
+                position={[-300, 0, 0]}
+                rotation={[-Math.PI / 2, 0, 0]}
+                scale={100}
+              >
+                <mesh
+                  castShadow
+                  receiveShadow
+                  geometry={nodes.VRM_main_material_0.geometry}
                   material={materials.main_material}
                 />
               </group>

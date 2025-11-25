@@ -15,17 +15,14 @@ const page = () => {
   return (
     <>
       {/* <BodyFrame/> */}
-   {/* <Header/> */}
-   {/* <HeroCopy/> */}
-   {/* <HeroBackground/> */}
-   {/* <Footer/> */}
-      {/* <div className="h-screen w-full bg-red-400"></div> */}
+      <Header/>
+      {/* <HeroCopy/> */}
+      {/* <HeroBackground/> */}
+      {/* <Footer/> */}
       <ModelSequence />
-      {/* <div className="h-screen w-full bg-red-400"></div> */}
       {/* <RTXONOFF/> */}
       {/* <PerformanceChart/> */}
       {/* <PerformanceChart/> */}
-      
     </>
   );
 };

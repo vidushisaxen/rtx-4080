@@ -16,7 +16,7 @@ export default function InfoPopupsForSequence() {
   useEffect(() => {
     const timeline1 = ScrollTrigger.create({
       trigger: "#model-sequence",
-      start: "28.5% center",
+      start: "27.5% center",
       end: "30% center",
       markers: false,
       onEnter: () => {
@@ -92,8 +92,8 @@ export default function InfoPopupsForSequence() {
 
     const timeline5 = ScrollTrigger.create({
       trigger: "#model-sequence",
-      start: "88.7% center",
-      end: "92.2% center",
+      start: "85.7% center",
+      end: "88.2% bottom",
       markers: false,
       onEnter: () => {
         setFifthPopUpToggler(true);
