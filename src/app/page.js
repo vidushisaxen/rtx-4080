@@ -15,12 +15,12 @@ const page = () => {
   return (
     <>
       {/* <BodyFrame/> */}
-      <Header/>
-      {/* <HeroCopy/> */}
+      <Header />
+      {/* <HeroCopy /> */}
       {/* <HeroBackground/> */}
-      {/* <Footer/> */}
+      <RTXONOFF />
       <ModelSequence />
-      {/* <RTXONOFF/> */}
+      {/* <Footer /> */}
       {/* <PerformanceChart/> */}
       {/* <PerformanceChart/> */}
     </>

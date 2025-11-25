@@ -7,7 +7,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { Center, Effects, Environment, OrbitControls, Sparkles } from "@react-three/drei";
+import { Center, Effects, Environment, OrbitControls, Sparkles, Stats } from "@react-three/drei";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ModelExperience from "./ModelExperience";
@@ -76,6 +76,7 @@ export default function ModelSequence() {
           flat
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
+          <Stats />
           <Sparkles
             count={100}
             scale={[15, 15, 1]}
