@@ -7,16 +7,24 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { Center, Effects, Environment, OrbitControls, Sparkles, Stats } from "@react-three/drei";
+import {
+  Center,
+  Effects,
+  Environment,
+  OrbitControls,
+  Sparkles,
+  Stats,
+} from "@react-three/drei";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ModelExperience from "./ModelExperience";
 import FallBackLoader from "./FallBackLoader";
 import InfoPopupsForSequence from "./InfoPopupsForSequence";
-import { DepthOfField, EffectComposer } from "@react-three/postprocessing";
+import DirectionalLightComponent from "./DirectionalLightComponent";
 gsap.registerPlugin(ScrollTrigger);
 
-export default function ModelSequence() {
+
+export default function ModelSequence({ colorTheme = "#5cffa3" }) {
   const containerRef = useRef(null);
   const modelRef = useRef(null);
   const [cameraAngle, setCameraAngle] = useState({
@@ -55,7 +63,7 @@ export default function ModelSequence() {
       className="h-[2500vh] w-full  relative"
     >
       <div className="h-screen w-full bg-black sticky top-0">
-        <InfoPopupsForSequence />
+        <InfoPopupsForSequence colorTheme={colorTheme} />
         <Canvas
           gl={{
             antialias: true,
@@ -76,34 +84,22 @@ export default function ModelSequence() {
           flat
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
-          <Stats />
+          <Stats showPanel={0} />
           <Sparkles
             count={100}
             scale={[15, 15, 1]}
             size={10}
             speed={0.4}
             opacity={0.3}
-            color="#5cffa3"
+            color={colorTheme}
             position={[0, 0, 0]}
           />
-          {/* <ambientLight intensity={0.1} /> */}
-          {/* <directionalLight
-            position={[0, -10, 0]}
-            intensity={2}
-            color="#5cffa3"
-            // castShadow
-          />
-          <directionalLight
-            position={[0, 10, 0]}
-            intensity={5}
-            color="#5cffa3"
-          /> */}
-
+          {/* <ambientLight intensity={15} color={"#ffffff"} />
           <Environment
             preset="studio"
             environmentRotation={[-Math.PI / 4, 0, 0]}
-            environmentIntensity={1}
-          />
+            environmentIntensity={0.1}
+          /> */}
 
           <Suspense fallback={<FallBackLoader />}>
             <Center>
@@ -116,14 +112,9 @@ export default function ModelSequence() {
               />
             </Center>
           </Suspense>
-          {/* <OrbitControls /> */}
+          <OrbitControls enableZoom={false} />
           {/* MAINLIGHT */}
-          <directionalLight
-            position={[0, 15, 2]}
-            intensity={20}
-            color="#5cffa3"
-            target-position={[0, -1, 0]}
-          />
+          <DirectionalLightComponent colorTheme={colorTheme} />
         </Canvas>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function InfoPopupsForSequence() {
+export default function InfoPopupsForSequence({colorTheme="#5cffa3"}) {
   const [popUpToggler, setPopUpToggler] = useState(false);
   const [secondPopUpToggler, setSecondPopUpToggler] = useState(false);
   const [thirdPopUpToggler, setThirdPopUpToggler] = useState(false);
@@ -120,7 +120,7 @@ export default function InfoPopupsForSequence() {
 
   return (
     <>
-      <div className="h-full w-full absolute bg-[#5cffa3]  inset-0 opacity-15 z-[10]">
+      {/* <div className="h-full w-full absolute bg-[${colorTheme}]  inset-0 opacity-15 z-[10]">
         <Image
           src={"/assets/img/sequenceOverlay.png"}
           alt="sequenceOverlay"
@@ -128,14 +128,26 @@ export default function InfoPopupsForSequence() {
           width={1000}
           className="object-cover  h-full w-full opacity-100 "
         />
-      </div>
+      </div> */}
       <div
-        className="h-full w-full absolute inset-0 z-[11] opacity-20"
+        className="h-full w-full absolute inset-0 z-[11] opacity-15"
         style={{
-          background: "radial-gradient(circle, transparent 30%, #5cffa3 100%)",
+          background: `radial-gradient(circle, transparent 30%, ${colorTheme} 100%)`,
         }}
       ></div>
-      <p className="text-[#5cffa3]/100 z-[11] text-[20.4vw] font-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_30px_rgba(92,255,163,0.3)] [text-shadow:0_0_25px_rgba(92,255,163,0.3),0_0_25px_rgba(92,255,163,0.3)]">
+      <p 
+        className="z-[11] opacity-80 text-[20.4vw] font-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{
+          background: 'linear-gradient(to right, #6b7280, #ffffff)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          // color: colorTheme,
+          
+          // filter: `drop-shadow(0 0 30px ${colorTheme}50)`,
+          // textShadow: `0 0 25px ${colorTheme}50, 0 0 25px ${colorTheme}50`
+        }}
+      >
         GEFORCE
       </p>
 

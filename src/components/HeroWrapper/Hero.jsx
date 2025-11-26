@@ -38,7 +38,7 @@ function Model({ spotLightRef, ...props }) {
       ref={groupRef}
       dispose={null}
       scale={0.025}
-      position={[1, -2, 0]}
+      position={[0, 0, 0]}
     >
       <group rotation={[Math.PI, -Math.PI/4, 0]}>
         <group rotation={[Math.PI / 2.2, 0, 0]} scale={0.01}>

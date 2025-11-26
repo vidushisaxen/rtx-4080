@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import HeroWrapper from "@/components/HeroWrapper";
 import InfoPopup from "@/components/InfoPopup";
 import ModelSequence from "@/components/ModelSequence/ModelSequence";
+import OpeningScene from "@/components/HeroScene/HeroScene";
 import RTXONOFF from "@/components/RTX_ON_OFF";
 import React from "react";
 
@@ -12,10 +13,11 @@ const page = () => {
   return (
     <>
       {/* <BodyFrame/> */}
-      <Header />
-     <HeroWrapper/>
-      <ModelSequence />
-      <RTXONOFF />
+      {/* <Header /> */}
+     {/* <HeroWrapper/> */}
+      {/* <ModelSequence /> */}
+      <OpeningScene />
+      {/* <RTXONOFF /> */}
       {/* <Footer /> */}
       {/* <PerformanceChart/> */}
       {/* <PerformanceChart/> */}
