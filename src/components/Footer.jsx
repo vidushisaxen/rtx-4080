@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ScrambleText from "./h/ScrambleText";
 import Image from "next/image";
-import HeroBackground from '@/components/HeroBackground'
+import HeroBackground from '@/components/HeroWrapper/HeroBackground'
 
 
 export default function Footer() {
