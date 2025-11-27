@@ -41,7 +41,7 @@ export default function HeroScene() {
   }, []);
 
   return (
-    <div className="h-screen w-full bg-black" onClick={onclickPlay}>
+    <div className="h-screen w-full bg-black" >
       <Canvas
         gl={{
           antialias: true,
@@ -68,6 +68,12 @@ export default function HeroScene() {
           {/* <OrbitControls enableZoom={false} target={[0, 0, 0]} /> */}
         </SheetProvider>
       </Canvas>
+      <div onClick={onclickPlay}  className="absolute bottom-[3%] cursor-pointer left-1/2 !z-[99999] -translate-x-1/2 bg-black">
+        <p className="bg-white/10 backdrop-blur-2xl text-green-500  px-[3vw] py-[1vw] text-[1vw] rounded-full ">
+          Enter The Experience
+        </p>
+      </div>
     </div>
+    
   );
 }
