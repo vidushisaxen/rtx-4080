@@ -20,6 +20,10 @@ export default function HeroScene() {
     "Hero Sheet"
   );
 
+  const onclickPlay = () => {
+    RtxSheet.sequence.play();
+  };
+
 
   // RtxSheet.onValuesChange(() => {
   //   console.log(
@@ -37,7 +41,7 @@ export default function HeroScene() {
   }, []);
 
   return (
-    <div className="h-screen w-full bg-black">
+    <div className="h-screen w-full bg-black" onClick={onclickPlay}>
       <Canvas
         gl={{
           antialias: true,
