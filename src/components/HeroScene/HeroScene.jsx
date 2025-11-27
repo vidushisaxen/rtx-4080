@@ -1,17 +1,40 @@
 "use client";
-import React, { Suspense, useRef } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Center, OrbitControls, Environment, Stats } from "@react-three/drei";
-import { getProject } from "@theatre/core";
+import {
+  Center,
+  OrbitControls,
+  Environment,
+  Stats,
+  EnvironmentPortal,
+} from "@react-three/drei";
+import { getProject, val } from "@theatre/core";
 import { SheetProvider } from "@theatre/r3f";
 import HeroModel from "./HeroMode";
 import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
+import ProjectState from "../../theatre/light.json";
 
-studio.extend(extension);
 export default function HeroScene() {
-  const RtxSheet = getProject("RTXHero").sheet("Hero Sheet");
-  studio.initialize();
+  const RtxSheet = getProject("RTXHero", { state: ProjectState }).sheet(
+    "Hero Sheet"
+  );
+
+
+  // RtxSheet.onValuesChange(() => {
+  //   console.log(
+  //     "NEW STATE:",
+  //     JSON.stringify(RtxSheet.exportState(), null, 2)
+  //   );
+  // });
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      studio.initialize();
+      studio.extend(extension);
+
+    }
+  }, []);
 
   return (
     <div className="h-screen w-full bg-black">
@@ -32,15 +55,13 @@ export default function HeroScene() {
         shadows
       >
         <SheetProvider sheet={RtxSheet}>
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={1} />
-
-          <Environment preset="studio" />
+          {/* <EnvironmentPortal preset="studio" environmentIntensity={.1} /> */}
+          {/* <ambientLight intensity={1} /> */}
           <Center>
             <HeroModel />
           </Center>
 
-          <OrbitControls enableZoom={false} target={[0, 0, 0]} />
+          {/* <OrbitControls enableZoom={false} target={[0, 0, 0]} /> */}
         </SheetProvider>
       </Canvas>
     </div>

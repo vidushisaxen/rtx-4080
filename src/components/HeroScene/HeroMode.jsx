@@ -1,5 +1,6 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { editable as e } from "@theatre/r3f";
+import { gsap } from "gsap";
 
 const { useGLTF } = require("@react-three/drei");
 
@@ -7,8 +8,28 @@ export default function HeroModel({ modelPath = "/assets/models/model-compressed
     const group = useRef();
     const { nodes, materials } = useGLTF(modelPath);
   
+    useEffect(() => {
+      const handleMouseMove = (e) => {
+        if (!group.current) return;
+        
+        const x = (e.clientX / window.innerWidth - 0.5) * 0.2;
+        const y = (e.clientY / window.innerHeight - 0.5) * 0.2;
+        
+        gsap.to(group.current.rotation, {
+          x: y,
+          y: x,
+          duration: 1.5,
+          ease: "power1.out"
+        });
+      };
+
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => window.removeEventListener("mousemove", handleMouseMove);
+    }, []);
+
     return (
-      <e.group theatreKey="HeroModel" scale={0.008} ref={group} {...props} dispose={null}>
+      <e.group theatreKey="HeroModel" scale={0.01} ref={group} {...props} dispose={null}>
+        <e.pointLight theatreKey="PointLight" theatreX={10} theatreY={10} theatreZ={5} intensity={1} color="#ffffff" />
         <group name="Scene">
           <mesh
             name="Cube"
@@ -17,7 +38,7 @@ export default function HeroModel({ modelPath = "/assets/models/model-compressed
             geometry={nodes.Cube.geometry}
             material={materials.Material}
           />
-          <group name="Sketchfab_model" rotation={[Math.PI / 2, 0, 0]}>
+          <group name="Sketchfab_model" rotation={[Math.PI, 0, 0]}>
             <group
               name="2fce4507a0554c6cb5f90f77bc6392b2fbx"
               rotation={[Math.PI / 2, 0, 0]}
@@ -97,7 +118,16 @@ export default function HeroModel({ modelPath = "/assets/models/model-compressed
                       material={materials.main_material}
                       position={[-0.031, -0.011, 0]}
                       scale={152.526}
-                    />
+                    >
+                      <meshStandardMaterial
+                        {...materials.main_material}
+                        metalness={1.0}
+                        roughness={0}
+                        color={'white'}
+                        envMapIntensity={5.0}
+                        reflectivity={1.0}
+                      />
+                    </mesh>
                   </group>
                   <group
                     name="PCB"
