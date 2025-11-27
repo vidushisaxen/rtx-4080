@@ -8,6 +8,7 @@ import ModelSequence from "@/components/ModelSequence/ModelSequence";
 import OpeningScene from "@/components/HeroScene/HeroScene";
 import RTXONOFF from "@/components/RTX_ON_OFF";
 import React from "react";
+import BeamsScene from "@/components/BeamsExperiement/BeamsScene";
 
 const page = () => {
   return (
@@ -16,7 +17,8 @@ const page = () => {
       {/* <Header /> */}
      {/* <HeroWrapper/> */}
       {/* <ModelSequence /> */}
-      <OpeningScene />
+      {/* <OpeningScene /> */}
+      <BeamsScene />
       {/* <RTXONOFF /> */}
       {/* <Footer /> */}
       {/* <PerformanceChart/> */}
