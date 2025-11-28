@@ -12,7 +12,7 @@ import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
 import { getProject } from "@theatre/core";
 import { editable as e, SheetProvider } from "@theatre/r3f";
-import theatreState from "../../theatre/modelAnim.json";
+import SequenceAnim from '../../theatre/Anim.json'
 
 export default function HeroMain() {
   const lenis = useLenis();
@@ -24,39 +24,40 @@ export default function HeroMain() {
   const [pointLightIntensity, setPointLightIntensity] = useState(0);
   const modelRef = useRef(null);
   const fanRotationRef = useRef(null);
+const [isAnimationRunning, setIsAnimationRunning] = useState(true);
+  const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet("Hero Main Sheet");
 
-  // THEATRE SETUP
-  const HeroMainSheet = getProject("HeroMain", { state: theatreState }).sheet("Hero Main Sheet");
-  // useEffect(() => {
-  //   const handleMouseMove = (e) => {
-  //     if (!centerGroupRef.current) return;
 
-  //     const x = (e.clientX / window.innerWidth - 0.5) * 0.2;
-  //     const y = (e.clientY / window.innerHeight - 0.5) * 0.2;
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!centerGroupRef.current) return;
 
-  //     gsap.to(centerGroupRef.current.rotation, {
-  //       x: y,
-  //       y: x,
-  //       duration: 1.5,
-  //       ease: "power1.out",
-  //     });
+      const x = (e.clientX / window.innerWidth - 0.5) * 0.2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 0.2;
 
-  //     if (pointLightRef.current) {
-  //       const lightX = (e.clientX / window.innerWidth - 0.5) * 10;
-  //       const lightY = -(e.clientY / window.innerHeight - 0.5) * 10;
+      gsap.to(centerGroupRef.current.rotation, {
+        x: y,
+        y: x,
+        duration: 1.5,
+        ease: "power1.out",
+      });
 
-  //       gsap.to(pointLightRef.current.position, {
-  //         x: lightX,
-  //         y: lightY,
-  //         duration: 1,
-  //         ease: "power1.out",
-  //       });
-  //     }
-  //   };
+      if (pointLightRef.current) {
+        const lightX = (e.clientX / window.innerWidth - 0.5) * 10;
+        const lightY = -(e.clientY / window.innerHeight - 0.5) * 10;
 
-  //   window.addEventListener("mousemove", handleMouseMove);
-  //   return () => window.removeEventListener("mousemove", handleMouseMove);
-  // }, []);
+        gsap.to(pointLightRef.current.position, {
+          x: lightX,
+          y: lightY,
+          duration: 1,
+          ease: "power1.out",
+        });
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
@@ -112,6 +113,9 @@ export default function HeroMain() {
         opacity: 0,
         duration: 1.5,
         ease: "power2.out",
+        onComplete: () => {
+          setIsAnimationRunning(false);
+        },
       },
       "<"
     );
@@ -141,9 +145,17 @@ export default function HeroMain() {
     }
   };
 
+  const runAnimation = () => {
+    if (!isAnimationRunning) {
+      HeroMainSheet.sequence.play();
+      setIsAnimationRunning(true);
+    }
+  };
+
   return (
     <div className="h-screen sticky top-0 w-full bg-black">
       <Canvas
+        onClick={runAnimation}
         gl={{
           antialias: true,
           alpha: true,
