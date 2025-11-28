@@ -2,7 +2,7 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Center, Environment, Stars } from "@react-three/drei";
+import { Center, Environment, Stars, useProgress } from "@react-three/drei";
 import BeamLoader from "./BeamLoader";
 import ActualModel from "./ActualModel";
 import FallBackLoader from "../ModelSequence/FallBackLoader";
@@ -24,7 +24,9 @@ export default function HeroMain() {
   const [pointLightIntensity, setPointLightIntensity] = useState(0);
   const modelRef = useRef(null);
   const fanRotationRef = useRef(null);
-const [isAnimationRunning, setIsAnimationRunning] = useState(true);
+  const [isAnimationRunning, setIsAnimationRunning] = useState(true);
+  const { progress, loaded, total } = useProgress();
+  const isModelLoaded = progress === 100;
   const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet("Hero Main Sheet");
 
 
@@ -203,7 +205,13 @@ const [isAnimationRunning, setIsAnimationRunning] = useState(true);
             <Center>
               <group scale={0.8} ref={centerGroupRef}>
                 <group ref={BeamLoaderRef}>
-                  <BeamLoader shaderOpacity={shaderOpacity} />
+                  <BeamLoader 
+                    shaderOpacity={shaderOpacity} 
+                    isModelLoaded={isModelLoaded}
+                    progress={progress}
+                    loaded={loaded}
+                    total={total}
+                  />
                 </group>
                 <e.group position={[0, -1.2, 0]} theatreKey="MainModelMesh" ref={modelRef}>
                   <ActualModel

@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { gsap } from "gsap";
 gsap.registerPlugin(ScrollTrigger);
 import { editable as e } from "@theatre/r3f";
-export default function ActualModel() {
+export default function ActualModel({ toggleFanRotation, fanRotationRef }) {
   const { nodes, materials } = useGLTF("/assets/models/BeamModel.glb");
   const enhancedMaterials = useEnhancedMaterials(materials);
   const { camera } = useThree();

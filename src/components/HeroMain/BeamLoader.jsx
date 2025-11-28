@@ -4,7 +4,14 @@ import { useFrame } from "@react-three/fiber";
 import { createFlowingBeamMaterial } from "./FlowingBeamShader";
 import { degToRad } from "three/src/math/MathUtils";
 
-export default function BeamLoader({ BeamLoaderRef, shaderOpacity = 1.0 }) {
+export default function BeamLoader({ 
+  BeamLoaderRef, 
+  shaderOpacity = 1.0, 
+  isModelLoaded = false,
+  progress = 0,
+  loaded = 0,
+  total = 0
+}) {
   const { nodes } = useGLTF("/assets/models/BeamModel.glb");
 
   // Refs for shader materials
@@ -15,8 +22,11 @@ export default function BeamLoader({ BeamLoaderRef, shaderOpacity = 1.0 }) {
   const flowingBeamMaterial1 = useMemo(() => createFlowingBeamMaterial(), []);
   const flowingBeamMaterial2 = useMemo(() => createFlowingBeamMaterial(), []);
 
-  // Animation loop for shader uniforms
+  // Animation loop for shader uniforms - only run when model is loaded
   useFrame((state) => {
+    // Only start shader animation after model is fully loaded (progress = 100%)
+    if (progress < 100) return;
+
     const currentTime = state.clock.elapsedTime;
 
     // Update material 1 uniforms
