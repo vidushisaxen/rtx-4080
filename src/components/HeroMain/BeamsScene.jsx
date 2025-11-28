@@ -29,36 +29,36 @@ export default function HeroMain() {
   const HeroMainSheet = getProject("HeroMain").sheet("Hero Main Sheet");
 
 
-  // useEffect(() => {
-  //   const handleMouseMove = (e) => {
-  //     if (!centerGroupRef.current) return;
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!centerGroupRef.current) return;
 
-  //     const x = (e.clientX / window.innerWidth - 0.5) * 0.2;
-  //     const y = (e.clientY / window.innerHeight - 0.5) * 0.2;
+      const x = (e.clientX / window.innerWidth - 0.5) * 0.2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 0.2;
 
-  //     gsap.to(centerGroupRef.current.rotation, {
-  //       x: y,
-  //       y: x,
-  //       duration: 1.5,
-  //       ease: "power1.out",
-  //     });
+      gsap.to(centerGroupRef.current.rotation, {
+        x: y,
+        y: x,
+        duration: 1.5,
+        ease: "power1.out",
+      });
 
-  //     if (pointLightRef.current) {
-  //       const lightX = (e.clientX / window.innerWidth - 0.5) * 10;
-  //       const lightY = -(e.clientY / window.innerHeight - 0.5) * 10;
+      if (pointLightRef.current) {
+        const lightX = (e.clientX / window.innerWidth - 0.5) * 10;
+        const lightY = -(e.clientY / window.innerHeight - 0.5) * 10;
 
-  //       gsap.to(pointLightRef.current.position, {
-  //         x: lightX,
-  //         y: lightY,
-  //         duration: 1,
-  //         ease: "power1.out",
-  //       });
-  //     }
-  //   };
+        gsap.to(pointLightRef.current.position, {
+          x: lightX,
+          y: lightY,
+          duration: 1,
+          ease: "power1.out",
+        });
+      }
+    };
 
-  //   window.addEventListener("mousemove", handleMouseMove);
-  //   return () => window.removeEventListener("mousemove", handleMouseMove);
-  // }, []);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   // useEffect(() => {
   //   if (process.env.NODE_ENV === "development") {
