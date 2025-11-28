@@ -1,31 +1,50 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useEnhancedMaterials } from "./MaterialsConfig";
+import { useThree } from "@react-three/fiber";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { gsap } from "gsap";
+gsap.registerPlugin(ScrollTrigger);
 
 export default function ActualModel() {
   const { nodes, materials } = useGLTF("/assets/models/BeamModel.glb");
-
-  // Get enhanced materials with textures
   const enhancedMaterials = useEnhancedMaterials(materials);
+  const { camera } = useThree();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleCameraUpdate = () => {
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+    };
+
+    let lastCall = 0;
+    const throttledUpdate = () => {
+      const now = Date.now();
+      if (now - lastCall >= 16) {
+        // 60fps throttle
+        handleCameraUpdate();
+        lastCall = now;
+      }
+    };
+
+    ScrollTrigger.addEventListener("refresh", throttledUpdate);
+
+    return () => {
+      ScrollTrigger.removeEventListener("refresh", throttledUpdate);
+    };
+  }, [camera]);
 
   return (
     <Suspense fallback={null}>
       <group dispose={null}>
         <group
           scale={0.015}
-          position={[0, -1.2, 0]}
+          position={[0, 0, 0]}
           rotation={[Math.PI / 2, 0, 0]}
           name="ActualModelScene"
         >
-          {/* Base Cube */}
-          <mesh
-            name="Cube"
-            castShadow
-            receiveShadow
-            geometry={nodes.Cube.geometry}
-            material={materials.Material}
-          />
-          
           <group name="Sketchfab_model" rotation={[Math.PI / 2, 0, 0]}>
             <group
               name="2fce4507a0554c6cb5f90f77bc6392b2fbx"

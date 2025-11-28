@@ -8,21 +8,16 @@ import ModelSequence from "@/components/ModelSequence/ModelSequence";
 import OpeningScene from "@/components/HeroScene/HeroScene";
 import RTXONOFF from "@/components/RTX_ON_OFF";
 import React from "react";
-import BeamsScene from "@/components/BeamsExperiement/BeamsScene";
+import HeroMain from "@/components/HeroMain/BeamsScene";
 
 const page = () => {
   return (
     <>
-      {/* <BodyFrame/> */}
-      {/* <Header /> */}
-     {/* <HeroWrapper/> */}
-      {/* <ModelSequence /> */}
-      {/* <OpeningScene /> */}
-      <BeamsScene />
-      {/* <RTXONOFF /> */}
-      {/* <Footer /> */}
-      {/* <PerformanceChart/> */}
-      {/* <PerformanceChart/> */}
+      <div className="bg-black h-screen w-full flex items-center justify-center">
+        <div className="w-[95%] h-[92%] border-[1px] relative border-white/15 overflow-hidden rounded-[1vw]">
+          <HeroMain />
+        </div>
+      </div>
     </>
   );
 };

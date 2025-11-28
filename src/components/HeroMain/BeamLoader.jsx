@@ -4,16 +4,12 @@ import { useFrame } from "@react-three/fiber";
 import { createFlowingBeamMaterial } from "./FlowingBeamShader";
 import { degToRad } from "three/src/math/MathUtils";
 
-export default function BeamLoader({ onAnimationComplete }) {
+export default function BeamLoader({ BeamLoaderRef, shaderOpacity = 1.0 }) {
   const { nodes } = useGLTF("/assets/models/BeamModel.glb");
 
   // Refs for shader materials
   const beamMaterial1 = useRef();
   const beamMaterial2 = useRef();
-
-  // Refs to track animation completion
-  const animationComplete1 = useRef(false);
-  const animationComplete2 = useRef(false);
 
   // Create flowing beam shader materials
   const flowingBeamMaterial1 = useMemo(() => createFlowingBeamMaterial(), []);
@@ -22,56 +18,32 @@ export default function BeamLoader({ onAnimationComplete }) {
   // Animation loop for shader uniforms
   useFrame((state) => {
     const currentTime = state.clock.elapsedTime;
-    const flowSpeed = 0.1; // Should match the uFlowSpeed in shader
-    const animationDuration = 4.0 / flowSpeed; // Total time for one complete cycle
 
-    // Update material 1 uniforms only if animation hasn't completed
-    if (
-      flowingBeamMaterial1 &&
-      flowingBeamMaterial1.uniforms &&
-      !animationComplete1.current
-    ) {
-      const totalProgress = currentTime * flowSpeed;
-      if (totalProgress >= 4.0) {
-        // Animation completed, stop updating
-        animationComplete1.current = true;
-        flowingBeamMaterial1.uniforms.uTime.value = animationDuration;
-        
-        // Call callback when first animation completes
-        if (animationComplete2.current && onAnimationComplete) {
-          onAnimationComplete();
-        }
-      } else {
-        flowingBeamMaterial1.uniforms.uTime.value = currentTime;
-      }
+    // Update material 1 uniforms
+    if (flowingBeamMaterial1 && flowingBeamMaterial1.uniforms) {
+      flowingBeamMaterial1.uniforms.uTime.value = currentTime;
+      flowingBeamMaterial1.uniforms.uOpacity.value = shaderOpacity;
     }
 
-    // Update material 2 uniforms only if animation hasn't completed
-    if (
-      flowingBeamMaterial2 &&
-      flowingBeamMaterial2.uniforms &&
-      !animationComplete2.current
-    ) {
-      const totalProgress = currentTime * flowSpeed;
-      if (totalProgress >= 4.0) {
-        // Animation completed, stop updating
-        animationComplete2.current = true;
-        flowingBeamMaterial2.uniforms.uTime.value = animationDuration;
-        
-        // Call callback when both animations complete
-        if (animationComplete1.current && onAnimationComplete) {
-          onAnimationComplete();
-        }
-      } else {
-        flowingBeamMaterial2.uniforms.uTime.value = currentTime;
-      }
+    // Update material 2 uniforms
+    if (flowingBeamMaterial2 && flowingBeamMaterial2.uniforms) {
+      flowingBeamMaterial2.uniforms.uTime.value = currentTime;
+      flowingBeamMaterial2.uniforms.uOpacity.value = shaderOpacity;
+    }
+
+    // Set materials as transparent
+    if (flowingBeamMaterial1) {
+      flowingBeamMaterial1.transparent = true;
+    }
+    if (flowingBeamMaterial2) {
+      flowingBeamMaterial2.transparent = true;
     }
   });
 
   return (
-    <group dispose={null}>
+    <group ref={BeamLoaderRef} dispose={null}>
       <group
-        scale={0.015}
+        scale={0.015 * 1.0}
         position={[0, -1.2, 0]}
         rotation={[Math.PI / 2, 0, 0]}
         name="BeamLoaderScene"
