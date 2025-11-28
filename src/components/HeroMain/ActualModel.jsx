@@ -5,7 +5,7 @@ import { useThree } from "@react-three/fiber";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { gsap } from "gsap";
 gsap.registerPlugin(ScrollTrigger);
-
+import { editable as e } from "@theatre/r3f";
 export default function ActualModel() {
   const { nodes, materials } = useGLTF("/assets/models/BeamModel.glb");
   const enhancedMaterials = useEnhancedMaterials(materials);
@@ -54,7 +54,8 @@ export default function ActualModel() {
               <group name="Object_2">
                 <group name="RootNode">
                   {/* Fan Back */}
-                  <group
+                  <e.group
+                    theatreKey="FanMesh"
                     name="Fan_Back"
                     position={[8739.012, -2660, 0]}
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -72,7 +73,7 @@ export default function ActualModel() {
                       position={[0, 0, 6.099]}
                       scale={58}
                     />
-                  </group>
+                  </e.group>
 
                   {/* Fan Front */}
                   <group
@@ -117,7 +118,8 @@ export default function ActualModel() {
                   </group>
 
                   {/* IO Plate */}
-                  <group
+                  <e.group
+                    theatreKey="IOPlateMesh"
                     name="IO_Plate"
                     position={[-300, 0, 0]}
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -135,7 +137,7 @@ export default function ActualModel() {
                       position={[-158.797, -29.509, 1.815]}
                       scale={62.427}
                     />
-                  </group>
+                  </e.group>
 
                   {/* Metal Case */}
                   <group
@@ -159,7 +161,8 @@ export default function ActualModel() {
                   </group>
 
                   {/* PCB */}
-                  <group
+                  <e.group
+                    theatreKey="PCBMesh"
                     name="PCB"
                     position={[-300, 0, 0]}
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -177,7 +180,7 @@ export default function ActualModel() {
                       position={[-24.918, -7.336, -23.665]}
                       scale={77.693}
                     />
-                  </group>
+                  </e.group>
 
                   {/* Pin Connector */}
                   <group
@@ -201,7 +204,8 @@ export default function ActualModel() {
                   </group>
 
                   {/* Plastic Cover */}
-                  <group
+                  <e.group
+                    theatreKey="PlasticCoverMesh"
                     name="Plastic_Cover"
                     position={[-300.001, 0, 0]}
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -231,7 +235,7 @@ export default function ActualModel() {
                       position={[-78.441, 0, -26.05]}
                       scale={69.1}
                     />
-                  </group>
+                  </e.group>
 
                   {/* Ports */}
                   <group

@@ -8,7 +8,7 @@ import ModelSequence from "@/components/ModelSequence/ModelSequence";
 import OpeningScene from "@/components/HeroScene/HeroScene";
 import RTXONOFF from "@/components/RTX_ON_OFF";
 import React from "react";
-import HeroMain from "@/components/HeroMain/BeamsScene";
+import HeroMain from "@/components/HeroMain/HeroMainScreen";
 
 const page = () => {
   return (

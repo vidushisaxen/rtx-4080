@@ -1,0 +1,47 @@
+{
+  "sheetsById": {
+    "R3F UI": {
+      "staticOverrides": {
+        "byObject": {
+          "Editor Camera snapshot #1": {
+            "transform": {
+              "position": {
+                "x": -64.46629552547853,
+                "y": 23.24069288043635,
+                "z": -53.30713657198316
+              },
+              "target": {
+                "x": -4.580837696074868,
+                "y": 20.623941514838904,
+                "z": 7.1705119460672515
+              }
+            },
+            "lens": {
+              "zoom": 1.6329050632911413,
+              "fov": 87.93670886075941,
+              "near": 1,
+              "far": 1979,
+              "focus": 0
+            }
+          },
+          "Editor": {
+            "viewport": {
+              "referenceWindow": "maximized",
+              "shading": "wireframe",
+              "showOverlayIcons": true
+            },
+            "transformControls": {
+              "space": "local",
+              "mode": "scale"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitionVersion": "0.4.0",
+  "revisionHistory": [
+    "ct7R6fDEPhEAyEHP",
+    "0DWQkWX-ZYFGiJ4Y"
+  ]
+}

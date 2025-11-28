@@ -12,6 +12,7 @@ import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
 import { getProject } from "@theatre/core";
 import { editable as e, SheetProvider } from "@theatre/r3f";
+import theatreState from "../../theatre/modelAnim.json";
 
 export default function HeroMain() {
   const lenis = useLenis();
@@ -25,47 +26,44 @@ export default function HeroMain() {
   const fanRotationRef = useRef(null);
 
   // THEATRE SETUP
+  const HeroMainSheet = getProject("HeroMain", { state: theatreState }).sheet("Hero Main Sheet");
+  // useEffect(() => {
+  //   const handleMouseMove = (e) => {
+  //     if (!centerGroupRef.current) return;
 
-  const HeroMainSheet = getProject("HeroMain").sheet("Hero Main Sheet");
+  //     const x = (e.clientX / window.innerWidth - 0.5) * 0.2;
+  //     const y = (e.clientY / window.innerHeight - 0.5) * 0.2;
 
+  //     gsap.to(centerGroupRef.current.rotation, {
+  //       x: y,
+  //       y: x,
+  //       duration: 1.5,
+  //       ease: "power1.out",
+  //     });
+
+  //     if (pointLightRef.current) {
+  //       const lightX = (e.clientX / window.innerWidth - 0.5) * 10;
+  //       const lightY = -(e.clientY / window.innerHeight - 0.5) * 10;
+
+  //       gsap.to(pointLightRef.current.position, {
+  //         x: lightX,
+  //         y: lightY,
+  //         duration: 1,
+  //         ease: "power1.out",
+  //       });
+  //     }
+  //   };
+
+  //   window.addEventListener("mousemove", handleMouseMove);
+  //   return () => window.removeEventListener("mousemove", handleMouseMove);
+  // }, []);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!centerGroupRef.current) return;
-
-      const x = (e.clientX / window.innerWidth - 0.5) * 0.2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 0.2;
-
-      gsap.to(centerGroupRef.current.rotation, {
-        x: y,
-        y: x,
-        duration: 1.5,
-        ease: "power1.out",
-      });
-
-      if (pointLightRef.current) {
-        const lightX = (e.clientX / window.innerWidth - 0.5) * 10;
-        const lightY = -(e.clientY / window.innerHeight - 0.5) * 10;
-
-        gsap.to(pointLightRef.current.position, {
-          x: lightX,
-          y: lightY,
-          duration: 1,
-          ease: "power1.out",
-        });
-      }
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    if (process.env.NODE_ENV === "development") {
+      studio.initialize();
+      studio.extend(extension);
+    }
   }, []);
-
-  // useEffect(() => {
-  //   if (process.env.NODE_ENV === "development") {
-  //     studio.initialize();
-  //     studio.extend(extension);
-  //   }
-  // }, []);
 
   const handleClickEnterExperience = () => {
     const tl = gsap.timeline();
