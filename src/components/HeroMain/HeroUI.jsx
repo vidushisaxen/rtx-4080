@@ -106,7 +106,7 @@ export default function HeroUI({ isAnimationRunning }) {
         ref={titleRef}
         className="text-[5vw] w-[50%] font-bold leading-[1.1] text-[#E3E3E3]"
       >
-        Beyond GPUs. Beyond Quantum.
+        Beyond GPUs. <br /> Beyond Quantum.
       </h1>
       <p ref={descriptionRef} className="w-[25vw] text-[#C8C8C8]">
         An artifact engineered for the next era of computation.
