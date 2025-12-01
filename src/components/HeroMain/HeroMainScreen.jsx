@@ -1,20 +1,29 @@
 "use client";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Center, Environment, Stars, useProgress } from "@react-three/drei";
 import BeamLoader from "./BeamLoader";
 import ActualModel from "./ActualModel";
-import FallBackLoader from "../ModelSequence/FallBackLoader";
+import FallBackLoader from "./FallBackLoader";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import ReflectiveBase from "./ReflectiveBase";
+import HeroPopupSequence from "./HeroPopupSequence";
 import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
 import { getProject } from "@theatre/core";
 import { editable as e, SheetProvider } from "@theatre/r3f";
-import SequenceAnim from '../../theatre/Anim.json'
+import SequenceAnim from "../../theatre/Anim2.json";
+import SparkleBtn from "../BtnComponent/SparkleBtn";
+import ScrollTracker from "../ScrollTracker/ScrollTracker";
+import HeroUI from "./HeroUI";
+gsap.registerPlugin(ScrollTrigger);
 
-export default function HeroMain() {
+export default function HeroMain({
+  isAnimationRunning,
+  setIsAnimationRunning,
+}) {
   const lenis = useLenis();
   const BeamLoaderRef = useRef();
   const centerGroupRef = useRef();
@@ -24,12 +33,12 @@ export default function HeroMain() {
   const [pointLightIntensity, setPointLightIntensity] = useState(0);
   const modelRef = useRef(null);
   const fanRotationRef = useRef(null);
-  const [isAnimationRunning, setIsAnimationRunning] = useState(true);
   const { progress, loaded, total } = useProgress();
   const isModelLoaded = progress === 100;
-  const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet("Hero Main Sheet");
-
-
+  const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet(
+    "Hero Main Sheet"
+  );
+  // MOUSE MOVEMENT
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!centerGroupRef.current) return;
@@ -60,14 +69,53 @@ export default function HeroMain() {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
-
+  // LENIS
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      studio.initialize();
-      studio.extend(extension);
+    if (lenis) {
+      lenis.stop();
     }
-  }, []);
+  }, [lenis]);
 
+  // useEffect(() => {
+  //   if (process.env.NODE_ENV === "development") {
+  //     studio.initialize();
+  //     studio.extend(extension);
+  //   }
+  // }, []);
+  // SEQUENCE SCROLL
+  useEffect(() => {
+    if (typeof window === "undefined" || !HeroMainSheet) return;
+
+    const scrollTrigger = ScrollTrigger.create({
+      trigger: "#SequenceContainer",
+      start: "top top",
+      end: "99.5% bottom",
+      scrub: true,
+      markers: false,
+      onUpdate: (self) => {
+        const animationTime = self.progress * 18.08;
+        HeroMainSheet.sequence.position = animationTime;
+      },
+      onEnter: () => {
+        toggleFanRotation(true);
+      },
+      onLeave: () => {
+        toggleFanRotation(false);
+      },
+      onEnterBack: () => {
+        toggleFanRotation(true);
+      },
+      onLeaveBack: () => {
+        toggleFanRotation(false);
+      },
+    });
+
+    return () => {
+      scrollTrigger.kill();
+    };
+  }, [HeroMainSheet]);
+
+  // ENTER EXPERIENCE BUTTON
   const handleClickEnterExperience = () => {
     const tl = gsap.timeline();
     tl.to(
@@ -117,12 +165,14 @@ export default function HeroMain() {
         ease: "power2.out",
         onComplete: () => {
           setIsAnimationRunning(false);
+          lenis.start();
         },
       },
       "<"
     );
   };
 
+  // FAN ROTATION
   const toggleFanRotation = (value) => {
     if (!fanRotationRef.current) return;
 
@@ -146,92 +196,96 @@ export default function HeroMain() {
       });
     }
   };
-
-  const runAnimation = () => {
-    if (!isAnimationRunning) {
-      HeroMainSheet.sequence.play();
-      setIsAnimationRunning(true);
-    }
-  };
-
   return (
-    <div className="h-screen sticky top-0 w-full bg-black">
-      <Canvas
-        onClick={runAnimation}
-        gl={{
-          antialias: true,
-          alpha: true,
-          preserveDrawingBuffer: true,
-        }}
-        camera={{
-          position: [0, 0, 5],
-          fov: 40,
-          near: 0.1,
-          far: 1000,
-        }}
-        dpr={[1, 2]}
-        className="h-screen relative z-[12] w-full"
-        shadows
-        resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
-      >
-        <SheetProvider sheet={HeroMainSheet}>
-          <directionalLight
-            position={[0, 10, 0]}
-            intensity={lightIntensity}
-            color="#ffffff"
-          />
-          <pointLight
-            ref={pointLightRef}
-            position={[0, 0, 5]}
-            intensity={pointLightIntensity}
-            color="#ffffff"
-            distance={0}
-            decay={0.2}
-          />
+    <div id="SequenceContainer" className="h-[2500vh] w-full relative">
+      <div className="h-screen sticky top-0 w-full bg-black">
+        <HeroUI isAnimationRunning={isAnimationRunning} />
 
-          {/* EXTRAS */}
-          {/* <Environment preset="studio" environmentIntensity={1} /> */}
-          <Stars
-            radius={70}
-            depth={50}
-            count={5000}
-            factor={4}
-            saturation={0}
-            fade
-            speed={1}
-          />
-
-          <Suspense fallback={<FallBackLoader />}>
-            <Center>
-              <group scale={0.8} ref={centerGroupRef}>
-                <group ref={BeamLoaderRef}>
-                  <BeamLoader 
-                    shaderOpacity={shaderOpacity} 
-                    isModelLoaded={isModelLoaded}
-                    progress={progress}
-                    loaded={loaded}
-                    total={total}
-                  />
-                </group>
-                <e.group position={[0, -1.2, 0]} theatreKey="MainModelMesh" ref={modelRef}>
-                  <ActualModel
-                    toggleFanRotation={toggleFanRotation}
-                    fanRotationRef={fanRotationRef}
-                  />
-                </e.group>
-                <ReflectiveBase />
-              </group>
-            </Center>
-          </Suspense>
-        </SheetProvider>
-      </Canvas>
-      <div className="absolute expBtn bottom-20 left-0 w-full h-20   z-999 flex items-center justify-center">
-        <p
-          onClick={handleClickEnterExperience}
-          className="px-8 py-3 bg-white/10 cursor-pointer text-white font-thin uppercase rounded-full text-[.8vw] transition-colors duration-200 hover:bg-white/20"
+        <Canvas
+          gl={{
+            antialias: true,
+            alpha: true,
+            preserveDrawingBuffer: true,
+          }}
+          camera={{
+            position: [0, 0, 5],
+            fov: 40,
+            near: 0.1,
+            far: 1000,
+          }}
+          dpr={[1, 2]}
+          className="h-screen relative z-12 w-full"
+          shadows
+          resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
-          Enter Experience
-        </p>
+          <SheetProvider sheet={HeroMainSheet}>
+            <directionalLight
+              position={[0, 10, 0]}
+              intensity={lightIntensity}
+              color="#ffffff"
+            />
+            <pointLight
+              ref={pointLightRef}
+              position={[0, 0, 5]}
+              intensity={pointLightIntensity}
+              color="#ffffff"
+              distance={0}
+              decay={0.2}
+            />
+
+            {/* <Stars
+              radius={70}
+              depth={50}
+              count={5000}
+              factor={4}
+              saturation={0}
+              fade
+              speed={1}
+            /> */}
+
+            <Suspense fallback={<FallBackLoader />}>
+              <Center>
+                <group scale={0.8} ref={centerGroupRef}>
+                  <group ref={BeamLoaderRef}>
+                    <BeamLoader
+                      shaderOpacity={shaderOpacity}
+                      isModelLoaded={isModelLoaded}
+                      progress={progress}
+                      loaded={loaded}
+                      total={total}
+                    />
+                  </group>
+                  <e.group
+                    position={[0, -1.2, 0]}
+                    theatreKey="MainModelMesh"
+                    ref={modelRef}
+                  >
+                    <ActualModel
+                      toggleFanRotation={toggleFanRotation}
+                      fanRotationRef={fanRotationRef}
+                    />
+                  </e.group>
+                  <ReflectiveBase />
+                </group>
+              </Center>
+            </Suspense>
+          </SheetProvider>
+        </Canvas>
+        <HeroPopupSequence toggleFanRotation={toggleFanRotation} />
+
+        <div className="absolute expBtn bottom-5 left-0 w-full h-20  z-999 flex items-center justify-center">
+          {/* <p
+            onClick={handleClickEnterExperience}
+            className="px-8 py-3 bg-white/10 cursor-pointer text-white font-thin uppercase rounded-full text-[.8vw] transition-colors duration-200 hover:bg-white/20"
+          >
+            Enter Experience
+          </p> */}
+          <SparkleBtn
+            colorTheme="white"
+            onClick={handleClickEnterExperience}
+            children="Enter the Experience"
+          />
+        </div>
       </div>
     </div>
   );

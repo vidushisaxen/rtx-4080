@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { createFlowingBeamMaterial } from "./FlowingBeamShader";
@@ -17,28 +17,47 @@ export default function BeamLoader({
   // Refs for shader materials
   const beamMaterial1 = useRef();
   const beamMaterial2 = useRef();
+  
+  // Track when animation should start
+  const [animationStartTime, setAnimationStartTime] = useState(null);
+  const [hasStartedAnimation, setHasStartedAnimation] = useState(false);
 
   // Create flowing beam shader materials
   const flowingBeamMaterial1 = useMemo(() => createFlowingBeamMaterial(), []);
   const flowingBeamMaterial2 = useMemo(() => createFlowingBeamMaterial(), []);
+
+  // Set animation start time when model is fully loaded
+  useEffect(() => {
+    if (progress >= 100 && !hasStartedAnimation) {
+      setHasStartedAnimation(true);
+    }
+  }, [progress, hasStartedAnimation]);
 
   // Animation loop for shader uniforms - only run when model is loaded
   useFrame((state) => {
     // Only start shader animation after model is fully loaded (progress = 100%)
     if (progress < 100) return;
 
-    const currentTime = state.clock.elapsedTime;
+    // Set start time on first frame after loading completes
+    if (animationStartTime === null) {
+      setAnimationStartTime(state.clock.elapsedTime);
+      return;
+    }
+
+    // Calculate animation time from when loading completed
+    const animationTime = state.clock.elapsedTime - animationStartTime;
 
     // Update material 1 uniforms
     if (flowingBeamMaterial1 && flowingBeamMaterial1.uniforms) {
-      flowingBeamMaterial1.uniforms.uTime.value = currentTime;
+      flowingBeamMaterial1.uniforms.uTime.value = animationTime;
       flowingBeamMaterial1.uniforms.uOpacity.value = shaderOpacity;
     }
 
     // Update material 2 uniforms
     if (flowingBeamMaterial2 && flowingBeamMaterial2.uniforms) {
-      flowingBeamMaterial2.uniforms.uTime.value = currentTime;
+      flowingBeamMaterial2.uniforms.uTime.value = animationTime;
       flowingBeamMaterial2.uniforms.uOpacity.value = shaderOpacity;
+
     }
 
     // Set materials as transparent
@@ -48,6 +67,7 @@ export default function BeamLoader({
     if (flowingBeamMaterial2) {
       flowingBeamMaterial2.transparent = true;
     }
+    
   });
 
   return (

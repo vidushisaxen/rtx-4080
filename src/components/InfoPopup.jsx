@@ -71,7 +71,7 @@ export default function InfoPopup({
       opacity: 0,
       duration: 0.4,
       ease: "power2.in",
-      delay: 0.5,
+      delay: 0,
     });
 
     // Animate container scale with smoother easing
@@ -99,14 +99,14 @@ export default function InfoPopup({
   return (
     <div
       ref={containerRef}
-      className="relative w-[25vw] h-fit min-h-[10vh] bg-black/10 border border-[#5cffa3]/20 backdrop-blur-xl z-[200]"
+      className="relative min-w-[25vw] max-w-[30vw] h-fit min-h-[10vh] bg-black/10 border border-white/20 backdrop-blur-xl z-[200]"
       style={{ scale: 0 }}
     >
       <div className="absolute inset-0">
-        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute top-[4px] left-[4px]"></div>
-        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute top-[4px] right-[4px]"></div>
-        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute bottom-[4px] left-[4px]"></div>
-        <div className="w-[3px] h-[3px] bg-[#5cffa3] absolute bottom-[4px] right-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-white absolute top-[4px] left-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-white absolute top-[4px] right-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-white absolute bottom-[4px] left-[4px]"></div>
+        <div className="w-[3px] h-[3px] bg-white absolute bottom-[4px] right-[4px]"></div>
       </div>
       <div
         ref={textWrapperRef}

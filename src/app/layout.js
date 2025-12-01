@@ -10,15 +10,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <>
-    <LenisSmoothScroll />
     <html lang="en">
       <body
         className={`${fontVariables.combined} antialiased`}
       >
+        <LenisSmoothScroll />
         {children}
       </body>
     </html>
-    </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import ScrambleText from "./h/ScrambleText";
+import ScrambleText from "./HoverEffect/ScrambleText";
 import Image from "next/image";
 import Link from "next/link";
 

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ScrambleText from "./h/ScrambleText";
+import ScrambleText from "./HoverEffect/ScrambleText";
 import Image from "next/image";
 import HeroBackground from '@/components/HeroWrapper/HeroBackground'
 

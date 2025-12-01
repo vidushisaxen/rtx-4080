@@ -49,9 +49,9 @@ export const createFlowingBeamMaterial = () => {
         float maxDistance = sqrt(2.0); // Maximum possible distance in UV space
         float normalizedDist = distFromStart / maxDistance;
         
-        // Create a one-time progress that goes from 0 to 4 (0-2 for outward flow, 2-4 for return flow)
+        // Create a repeating cycle that loops every 4 seconds instead of stopping
         float totalProgress = uTime * uFlowSpeed;
-        float cycleProgress = clamp(totalProgress, 0.0, 4.0);
+        float cycleProgress = mod(totalProgress, 100.0);
         
         // Outward flow phase (0-2)
         float outwardProgress = clamp(cycleProgress, 0.0, 2.0) / 2.0;
@@ -81,23 +81,15 @@ export const createFlowingBeamMaterial = () => {
         // Combine trail effects
         float trailIntensity = 0.0;
         
-        // Only animate if we haven't completed the full cycle
-        if (totalProgress < 4.0) {
-          // Outward trail (bright moving trail)
-          if (cycleProgress <= 2.0) {
-            trailIntensity = outwardTrailMask * 2.0;
-          }
-          // Return trail (dimmer trail that "collects" the fill)
-          else {
-            trailIntensity = returnTrailMask * 1.5;
-            // Reduce fill intensity as return trail passes
-            fillMask *= step(returnTrailHead, normalizedDist);
-          }
+        // Outward trail (bright moving trail)
+        if (cycleProgress <= 2.0) {
+          trailIntensity = outwardTrailMask * 2.0;
         }
-        // After animation completes, keep surface dark/transparent
+        // Return trail (dimmer trail that "collects" the fill)
         else {
-          fillMask = 0.0;
-          trailIntensity = 0.0;
+          trailIntensity = returnTrailMask * 1.5;
+          // Reduce fill intensity as return trail passes
+          fillMask *= step(returnTrailHead, normalizedDist);
         }
         
         // Add pulsing effect to trail head

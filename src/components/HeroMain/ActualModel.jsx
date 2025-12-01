@@ -65,6 +65,7 @@ export default function ActualModel({ toggleFanRotation, fanRotationRef }) {
                       name="Fan_Back_main_material_0"
                       castShadow
                       receiveShadow
+                      ref={fanRotationRef}
                       geometry={nodes.Fan_Back_main_material_0.geometry}
                       material={
                         enhancedMaterials.main_material ||
