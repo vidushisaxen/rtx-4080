@@ -71,7 +71,7 @@ export default function InfoPopup({
       opacity: 0,
       duration: 0.4,
       ease: "power2.in",
-      delay: 0,
+      delay: 0.2,
     });
 
     // Animate container scale with smoother easing

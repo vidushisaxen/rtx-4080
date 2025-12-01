@@ -46,7 +46,7 @@ export default function NavBar({ isAnimationRunning }) {
     >
       <Link href={"/"} className="h-auto w-[10vw] ">
         <Image
-          src={"/assets/icons/hyperiux.svg"}
+          src={"/assets/icons/Hyperiux.svg"}
           height={100}
           width={100}
           alt="rtx-logo"
