@@ -20,14 +20,15 @@ export default function HeroUI({ isAnimationRunning }) {
       if (titleRef.current && descriptionRef.current) {
         // Split text into characters
         const titleSplit = new SplitText(titleRef.current, { type: "chars" });
-        const descriptionSplit = new SplitText(descriptionRef.current, { type: "chars" });
+        const descriptionSplit = new SplitText(descriptionRef.current, {
+          type: "chars",
+        });
 
         // Set initial state - blurred and invisible
         gsap.set([titleSplit.chars, descriptionSplit.chars], {
           opacity: 0,
-          scale:1.3,
+          scale: 1.3,
           filter: "blur(10px)",
-    
         });
 
         // Create timeline for animations
@@ -38,8 +39,8 @@ export default function HeroUI({ isAnimationRunning }) {
           opacity: 1,
           filter: "blur(0px)",
           duration: 3,
-          scale:1,
-          delay: .8,
+          scale: 1,
+          delay: 0.8,
           stagger: 0.04,
           ease: "power2.out",
         });
@@ -51,7 +52,7 @@ export default function HeroUI({ isAnimationRunning }) {
             opacity: 1,
             filter: "blur(0px)",
             duration: 2.5,
-            scale:1,
+            scale: 1,
             stagger: 0.03,
             ease: "power2.out",
           },
@@ -68,14 +69,14 @@ export default function HeroUI({ isAnimationRunning }) {
             const progress = self.progress;
             const opacity = 1 - progress;
             const blur = progress * 20; // Increase blur as we scroll
-            
+
             gsap.to(containerRef.current, {
               opacity: opacity,
               filter: `blur(${blur}px)`,
               duration: 0.1,
               ease: "none",
             });
-          }
+          },
         });
 
         // Cleanup function
@@ -83,7 +84,7 @@ export default function HeroUI({ isAnimationRunning }) {
           titleSplit.revert();
           descriptionSplit.revert();
           tl.kill();
-          ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+          ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
         };
       }
     } else {
@@ -97,20 +98,22 @@ export default function HeroUI({ isAnimationRunning }) {
   }, [isAnimationRunning]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="h-screen w-full absolute top-0 flex items-end gap-10 justify-start px-[4vw] pb-[6vw] left-0 z-[200]"
+      className="h-screen w-full absolute top-0  left-0 z-[200]"
       style={{ opacity: 0 }}
     >
-      <h1
-        ref={titleRef}
-        className="text-[5vw] w-[50%] font-bold leading-[1.1] text-[#E3E3E3]"
-      >
-        Beyond GPUs. <br /> Beyond Quantum.
-      </h1>
-      <p ref={descriptionRef} className="w-[25vw] text-[#C8C8C8]">
-        An artifact engineered for the next era of computation.
-      </p>
+      <div className="h-full w-full absolute flex items-end px-[4vw] pb-[6vw] gap-10 justify-start  top-0 left-0 z-[2">
+        <h1
+          ref={titleRef}
+          className="text-[5vw] w-[50%] font-bold leading-[1.1] text-[#E3E3E3]"
+        >
+          Beyond GPUs. <br /> Beyond Quantum.
+        </h1>
+        <p ref={descriptionRef} className="w-[25vw] text-[#C8C8C8]">
+          An artifact engineered for the next era of computation.
+        </p>
+      </div>
     </div>
   );
 }

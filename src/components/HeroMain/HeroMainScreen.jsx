@@ -18,6 +18,7 @@ import SequenceAnim from "../../theatre/Anim2.json";
 import SparkleBtn from "../BtnComponent/SparkleBtn";
 import ScrollTracker from "../ScrollTracker/ScrollTracker";
 import HeroUI from "./HeroUI";
+import { useBackgroundAudio } from "../SFX/Sounds";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
@@ -28,6 +29,7 @@ export default function HeroMain({
   const BeamLoaderRef = useRef();
   const centerGroupRef = useRef();
   const pointLightRef = useRef();
+  const buttonRef = useRef();
   const [shaderOpacity, setShaderOpacity] = useState(1.0);
   const [lightIntensity, setLightIntensity] = useState(0);
   const [pointLightIntensity, setPointLightIntensity] = useState(0);
@@ -38,6 +40,32 @@ export default function HeroMain({
   const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet(
     "Hero Main Sheet"
   );
+  
+  // Get background audio control
+  const { PlaySoundBackground } = useBackgroundAudio();
+
+  // Show button smoothly when model is loaded
+  useEffect(() => {
+    if (isModelLoaded && buttonRef.current) {
+      gsap.fromTo(
+        buttonRef.current,
+        {
+          opacity: 0,
+          visibility: "hidden",
+          y: 20,
+        },
+        {
+          opacity: 1,
+          visibility: "visible",
+          y: 0,
+          duration: 1,
+          ease: "power2.out",
+          delay: 6,
+        }
+      );
+    }
+  }, [isModelLoaded]);
+
   // MOUSE MOVEMENT
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -117,6 +145,9 @@ export default function HeroMain({
 
   // ENTER EXPERIENCE BUTTON
   const handleClickEnterExperience = () => {
+    // Start background audio when entering the experience
+    PlaySoundBackground(true);
+    
     const tl = gsap.timeline();
     tl.to(
       { opacity: shaderOpacity },
@@ -198,6 +229,8 @@ export default function HeroMain({
   };
   return (
     <div id="SequenceContainer" className="h-[2500vh] w-full relative">
+    
+
       <div className="h-screen sticky top-0 w-full bg-black">
         <HeroUI isAnimationRunning={isAnimationRunning} />
 
@@ -273,19 +306,18 @@ export default function HeroMain({
         </Canvas>
         <HeroPopupSequence toggleFanRotation={toggleFanRotation} />
 
-        <div className="absolute expBtn bottom-5 left-0 w-full h-20  z-999 flex items-center justify-center">
-          {/* <p
-            onClick={handleClickEnterExperience}
-            className="px-8 py-3 bg-white/10 cursor-pointer text-white font-thin uppercase rounded-full text-[.8vw] transition-colors duration-200 hover:bg-white/20"
+        {isModelLoaded && (
+          <div
+            ref={buttonRef}
+            className="absolute expBtn bottom-5 left-0 w-full h-20 z-999 flex items-center justify-center opacity-0"
           >
-            Enter Experience
-          </p> */}
-          <SparkleBtn
-            colorTheme="white"
-            onClick={handleClickEnterExperience}
-            children="Enter the Experience"
-          />
-        </div>
+            <SparkleBtn
+              colorTheme="white"
+              onClick={handleClickEnterExperience}
+              children="Enter the Experience"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,96 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Lato, sans-serif;
+  color: #ffffff;
+}
+
+.switchAudio {
+  position: relative;
+  z-index: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: none;
+  cursor: pointer;
+  padding: 0 45px 0 0;
+  margin: 0;
+}
+
+.switchAudio::after {
+  content: '';
+  width: 36px;
+  height: 36px;
+  background: red;
+  border-radius: 35px;
+  position: absolute;
+  right: -6px;
+  top: -8px;
+  z-index: -1;
+}
+
+.switchAudio:hover .buttonText::before {
+  transform: translateX(0%);
+}
+
+.buttonText {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  padding-bottom: 6px;
+  color: #ffffff;
+}
+
+.buttonText::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  height: 2px;
+  width: 300%;
+  bottom: 0px;
+  background: linear-gradient(to right, #ffffff 33.333%, transparent 33.333%, transparent 66.666%, #ffffff 66.666%);
+  transform-origin: 0 0;
+  transform: translateX(-66.666%);
+  transition: transform 0.5s ease-in-out;
+}
+
+.buttonText em {
+  font-style: normal;
+  display: inline-block;
+  width: 21px;
+}
+
+.buttonText em:nth-child(1) {
+  display: inline-block;
+}
+
+.buttonText em:nth-child(2) {
+  display: none;
+}
+
+.switchAudio.active .buttonText em:nth-child(1) {
+  display: none;
+}
+
+.switchAudio.active .buttonText em:nth-child(2) {
+  display: inline-block;
+}
+
+.canvasAudio {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  top: -4px;
+  width: 24px;
+  height: 24px;
+  margin-left: 24px;
+  transform: translateY(2px);
+}
+
+.audio {
+  width: 0;
+  height: 0;
+  opacity: 0.01;
+}

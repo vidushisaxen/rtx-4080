@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import AudioCanvas from "../AudioCanvas/AudioCanvas";
 
 export default function NavBar({ isAnimationRunning }) {
   const navRef = useRef(null);
@@ -53,15 +54,7 @@ export default function NavBar({ isAnimationRunning }) {
           className="h-full text-white w-full"
         />
       </Link>
-      <div className="p-[.9vw] cursor-pointer aspect-square flex items-center justify-center h-fit w-fit bg-[#42424280] rounded-full border border-white/10">
-        <Image
-          src={"/assets/icons/musicwave.svg"}
-          height={100}
-          width={100}
-          alt="rtx-logo"
-          className="h-[1.5vw] text-white w-[1.5vw]"
-        />
-      </div>
+    <AudioCanvas />
     </nav>
   );
 }

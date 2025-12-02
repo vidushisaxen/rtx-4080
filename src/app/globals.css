@@ -28,6 +28,13 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
+body::-webkit-scrollbar {
+  display: none;
+}
+body::selection {
+  background-color: var(--primary-1);
+  color: var(--background);
+}
 
 h1,
 h2,
