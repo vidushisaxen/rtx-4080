@@ -25,6 +25,10 @@ export const Fluid = ({
     densityDissipation = DEFAULT_CONFIG.densityDissipation,
     velocityDissipation = DEFAULT_CONFIG.velocityDissipation,
     blendFunction = DEFAULT_CONFIG.blendFunction,
+    // RGB Shift parameters
+    rgbShiftIntensity = DEFAULT_CONFIG.rgbShiftIntensity,
+    rgbShiftRadius = DEFAULT_CONFIG.rgbShiftRadius,
+    rgbShiftDirection = DEFAULT_CONFIG.rgbShiftDirection,
 }) => {
     const size = useThree((three) => three.size);
     const gl = useThree((three) => three.gl);
@@ -80,8 +84,13 @@ export const Fluid = ({
         [materials],
     );
 
-    useFrame((_, delta) => {
+    useFrame((state, delta) => {
         if (!meshRef.current || !postRef.current) return;
+
+        // Update RGB shift time for animation
+        if (postRef.current && postRef.current.updateTime) {
+            postRef.current.updateTime(state.clock.elapsedTime);
+        }
 
         for (let i = splatStack.length - 1; i >= 0; i--) {
             const { mouseX, mouseY, velocityX, velocityY } = splatStack[i];
@@ -164,6 +173,9 @@ export const Fluid = ({
                 blend={blend}
                 fluidColor={fluidColor}
                 showBackground={showBackground}
+                rgbShiftIntensity={rgbShiftIntensity}
+                rgbShiftRadius={rgbShiftRadius}
+                rgbShiftDirection={rgbShiftDirection}
                 ref={postRef}
                 tFluid={FBOs.density.read.texture}
             />

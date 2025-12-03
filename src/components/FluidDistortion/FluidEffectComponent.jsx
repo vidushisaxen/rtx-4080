@@ -18,8 +18,15 @@ export const FluidEffectComponent = React.forwardRef((props, ref) => {
         }
     }, [props]);
 
-    // Expose effect instance via ref
-    React.useImperativeHandle(ref, () => effectRef.current, []);
+    // Expose effect instance via ref with additional methods
+    React.useImperativeHandle(ref, () => ({
+        ...effectRef.current,
+        updateTime: (time) => {
+            if (effectRef.current && effectRef.current.updateTime) {
+                effectRef.current.updateTime(time);
+            }
+        }
+    }), []);
 
     return <primitive object={effect} />;
 });

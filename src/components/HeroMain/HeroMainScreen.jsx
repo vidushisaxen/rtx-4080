@@ -28,6 +28,7 @@ import SiriBackgroundShader from "./SiriBackgroundShader";
 import * as THREE from "three";
 import FluidCursor, { FluidScene } from "./CursorEffect";
 import { Fluid } from "../FluidDistortion";
+import { RGB_SHIFT_PRESETS } from "../FluidDistortion/constants";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
@@ -365,7 +366,20 @@ export default function HeroMain({
                   </group>
                 </Center>
               </Suspense>
-              <Fluid fluidColor="#093a2b" />
+              <Fluid 
+                fluidColor="#07251e" 
+                blend={.3}
+                rgbShiftIntensity={.1}
+                intensity={.1}
+                force={.8}
+                radius={0.5}
+                pressure={0.7}
+                densityDissipation={0.91}
+                distortion={1.0}
+                velocityDissipation={1.0}
+                rgbShiftRadius={0.2}
+                rgbShiftDirection={{ x: 1.0, y: 0.5 }}
+              />
             </EffectComposer>
           </SheetProvider>
         </Canvas>

@@ -18,6 +18,10 @@ export const DEFAULT_CONFIG = {
     dyeRes: 512,
     simRes: 128,
     blendFunction: BlendFunction.SET,
+    // RGB Shift Configuration
+    rgbShiftIntensity: 0.0,        // 0.0 = no shift, 5.0 = strong shift
+    rgbShiftRadius: 1.0,           // 0.1 = tight separation, 2.0 = wide separation
+    rgbShiftDirection: { x: 1.0, y: 0.0 }, // Base direction vector for RGB shift
 };
 
 export const REFRESH_RATE = 60;
