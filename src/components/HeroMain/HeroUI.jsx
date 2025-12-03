@@ -104,13 +104,19 @@ export default function HeroUI({ isAnimationRunning }) {
       style={{ opacity: 0 }}
     >
       <div className="h-full w-full absolute flex items-end px-[4vw] pb-[6vw] gap-10 justify-start  top-0 left-0 z-[2">
-        <h1
-          ref={titleRef}
-          className="text-[5vw] w-[50%] font-bold leading-[1.1] text-[#E3E3E3]"
-        >
-          Beyond GPUs. <br /> Beyond Quantum.
-        </h1>
-        <p ref={descriptionRef} className="w-[25vw] text-[#C8C8C8]">
+        <div className="w-[50%] ">
+          <h1
+            ref={titleRef}
+            className="text-[5vw] w-[100%] font-bold font-head leading-[1.1] text-white"
+            style={{
+              maskImage: 'linear-gradient(to right, black 0%, black 20%, black 0%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 20%, black 0%, transparent 100%)'
+            }}
+          >
+            Beyond GPUs. <br /> Beyond Quantum.
+          </h1>
+        </div>
+        <p ref={descriptionRef} className="w-[21vw] text-[1vw] text-[#C8C8C8]">
           An artifact engineered for the next era of computation.
         </p>
       </div>

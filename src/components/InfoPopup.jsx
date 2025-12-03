@@ -69,7 +69,7 @@ export default function InfoPopup({
     // Animate text wrapper with smooth fade and slide
     tl.to(textWrapperRef.current, {
       opacity: 0,
-      duration: 0.4,
+      duration: 0.3,
       ease: "power2.in",
       delay: 0.2,
     });
@@ -83,7 +83,7 @@ export default function InfoPopup({
         ease: "power2.in",
         transformOrigin: getTransformOrigin(),
       },
-      "-=0.2"
+      "-=0.4"
     );
   };
 

@@ -1,8 +1,14 @@
 "use client";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Center, Environment, Stars, useProgress } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { Center, Sparkles, useProgress } from "@react-three/drei";
+import {
+  EffectComposer,
+  Bloom,
+  Noise,
+  Vignette,
+} from "@react-three/postprocessing";
 import BeamLoader from "./BeamLoader";
 import ActualModel from "./ActualModel";
 import FallBackLoader from "./FallBackLoader";
@@ -14,11 +20,14 @@ import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
 import { getProject } from "@theatre/core";
 import { editable as e, SheetProvider } from "@theatre/r3f";
-import SequenceAnim from "../../theatre/Anim2.json";
+import SequenceAnim from "../../theatre/Anim1.json";
 import SparkleBtn from "../BtnComponent/SparkleBtn";
-import ScrollTracker from "../ScrollTracker/ScrollTracker";
 import HeroUI from "./HeroUI";
 import { useBackgroundAudio } from "../SFX/Sounds";
+import SiriBackgroundShader from "./SiriBackgroundShader";
+import * as THREE from "three";
+import FluidCursor, { FluidScene } from "./CursorEffect";
+import { Fluid } from "../FluidDistortion";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
@@ -33,6 +42,8 @@ export default function HeroMain({
   const [shaderOpacity, setShaderOpacity] = useState(1.0);
   const [lightIntensity, setLightIntensity] = useState(0);
   const [pointLightIntensity, setPointLightIntensity] = useState(0);
+  const [rippleOpacity, setRippleOpacity] = useState(0.05);
+  const [rippleIntensity, setRippleIntensity] = useState(0.2);
   const modelRef = useRef(null);
   const fanRotationRef = useRef(null);
   const { progress, loaded, total } = useProgress();
@@ -40,7 +51,7 @@ export default function HeroMain({
   const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet(
     "Hero Main Sheet"
   );
-  
+
   // Get background audio control
   const { PlaySoundBackground } = useBackgroundAudio();
 
@@ -77,7 +88,7 @@ export default function HeroMain({
       gsap.to(centerGroupRef.current.rotation, {
         x: y,
         y: x,
-        duration: 1.5,
+        duration: 4,
         ease: "power1.out",
       });
 
@@ -147,20 +158,52 @@ export default function HeroMain({
   const handleClickEnterExperience = () => {
     // Start background audio when entering the experience
     PlaySoundBackground(true);
-    
+
     const tl = gsap.timeline();
+
+    // Fade out beam loader shader
     tl.to(
       { opacity: shaderOpacity },
       {
         opacity: 0,
         duration: 1.5,
-
         ease: "power2.out",
         onUpdate: function () {
           setShaderOpacity(this.targets()[0].opacity);
         },
       }
     );
+
+    // Smoothly animate ripple background appearance
+    tl.to(
+      { rippleOp: rippleOpacity },
+      {
+        rippleOp: 0.2,
+        duration: 2.0,
+        delay: 0.5,
+        ease: "power2.inOut",
+        onUpdate: function () {
+          setRippleOpacity(this.targets()[0].rippleOp);
+        },
+      },
+      0
+    );
+
+    // Animate ripple intensity
+    tl.to(
+      { rippleInt: rippleIntensity },
+      {
+        rippleInt: 1.2,
+        duration: 2.5,
+        delay: 0.8,
+        ease: "power2.inOut",
+        onUpdate: function () {
+          setRippleIntensity(this.targets()[0].rippleInt);
+        },
+      },
+      0
+    );
+
     // INCREASE LIGHT INTENSITY FROM 0 to 4
     tl.to(
       { intensity: lightIntensity },
@@ -175,6 +218,7 @@ export default function HeroMain({
       },
       0
     );
+
     // INCREASE POINT LIGHT INTENSITY FROM 0 to 2
     tl.to(
       { pointIntensity: pointLightIntensity },
@@ -188,6 +232,8 @@ export default function HeroMain({
       },
       0
     );
+
+    // Fade out button
     tl.to(
       ".expBtn",
       {
@@ -229,8 +275,6 @@ export default function HeroMain({
   };
   return (
     <div id="SequenceContainer" className="h-[2500vh] w-full relative">
-    
-
       <div className="h-screen sticky top-0 w-full bg-black">
         <HeroUI isAnimationRunning={isAnimationRunning} />
 
@@ -239,6 +283,8 @@ export default function HeroMain({
             antialias: true,
             alpha: true,
             preserveDrawingBuffer: true,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 0.8,
           }}
           camera={{
             position: [0, 0, 5],
@@ -252,6 +298,15 @@ export default function HeroMain({
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
           <SheetProvider sheet={HeroMainSheet}>
+            {/* Black & White Ripple Background Shader */}
+            <SiriBackgroundShader
+              opacity={rippleOpacity}
+              color="#000000"
+              intensity={rippleIntensity}
+              speed={0.8}
+              rippleCount={3}
+            />
+
             <directionalLight
               position={[0, 10, 0]}
               intensity={lightIntensity}
@@ -265,43 +320,53 @@ export default function HeroMain({
               distance={0}
               decay={0.2}
             />
-
-            {/* <Stars
-              radius={70}
-              depth={50}
-              count={5000}
-              factor={4}
-              saturation={0}
-              fade
-              speed={1}
-            /> */}
-
-            <Suspense fallback={<FallBackLoader />}>
-              <Center>
-                <group scale={0.8} ref={centerGroupRef}>
-                  <group ref={BeamLoaderRef}>
-                    <BeamLoader
-                      shaderOpacity={shaderOpacity}
-                      isModelLoaded={isModelLoaded}
-                      progress={progress}
-                      loaded={loaded}
-                      total={total}
-                    />
+            <Sparkles
+              opacity={0.2}
+              color={"#00fff00"}
+              size={20}
+              position={[-7, 2.5, -7]}
+              count={10}
+              scale={3}
+              speed={0.2}
+            />
+            <Sparkles
+              opacity={0.2}
+              size={20}
+              color={"#00fff00"}
+              position={[7, 2.5, -7]}
+              count={10}
+              scale={3}
+              speed={0.2}
+            />
+            <EffectComposer>
+              <Suspense fallback={<FallBackLoader />}>
+                <Center>
+                  <group scale={0.8} ref={centerGroupRef}>
+                    <group ref={BeamLoaderRef}>
+                      <BeamLoader
+                        shaderOpacity={shaderOpacity}
+                        isModelLoaded={isModelLoaded}
+                        progress={progress}
+                        loaded={loaded}
+                        total={total}
+                      />
+                    </group>
+                    <e.group
+                      position={[0, -1.2, 0]}
+                      theatreKey="MainModelMesh"
+                      ref={modelRef}
+                    >
+                      <ActualModel
+                        toggleFanRotation={toggleFanRotation}
+                        fanRotationRef={fanRotationRef}
+                      />
+                    </e.group>
+                    {/* <ReflectiveBase /> */}
                   </group>
-                  <e.group
-                    position={[0, -1.2, 0]}
-                    theatreKey="MainModelMesh"
-                    ref={modelRef}
-                  >
-                    <ActualModel
-                      toggleFanRotation={toggleFanRotation}
-                      fanRotationRef={fanRotationRef}
-                    />
-                  </e.group>
-                  <ReflectiveBase />
-                </group>
-              </Center>
-            </Suspense>
+                </Center>
+              </Suspense>
+              <Fluid fluidColor="#093a2b" />
+            </EffectComposer>
           </SheetProvider>
         </Canvas>
         <HeroPopupSequence toggleFanRotation={toggleFanRotation} />
@@ -309,7 +374,7 @@ export default function HeroMain({
         {isModelLoaded && (
           <div
             ref={buttonRef}
-            className="absolute expBtn bottom-5 left-0 w-full h-20 z-999 flex items-center justify-center opacity-0"
+            className="absolute expBtn bottom-15 left-0 w-full h-20 z-999 flex items-center justify-center opacity-0"
           >
             <SparkleBtn
               colorTheme="white"

@@ -19,6 +19,7 @@ export default function ReflectiveBase() {
             minDepthThreshold={0.85}
             color="#111111"
             metalness={1.0}
+            transparent={true}
             roughness={1}
             distortion={0.2}
             distortionMap={distortionTexture}

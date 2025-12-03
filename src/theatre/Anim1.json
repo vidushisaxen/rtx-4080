@@ -198,7 +198,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": 0.8500000000000034
+                    "value": 0.13000000000000309
                   },
                   {
                     "id": "PhcyxnhbCT",
@@ -233,6 +233,19 @@
                     "value": 0
                   },
                   {
+                    "id": "8Y3cdDcwtB",
+                    "position": 3,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": -3.5
+                  },
+                  {
                     "id": "ODZPNW66lq",
                     "position": 5.967,
                     "connectedRight": true,
@@ -243,7 +256,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": -2.140000000000005
+                    "value": -3.5
                   },
                   {
                     "id": "6qwID6HPfb",
@@ -256,7 +269,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": 0.35999999999999477
+                    "value": -3.5
                   },
                   {
                     "id": "I9D-KyXVuR",
@@ -269,7 +282,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": 1.4299999999999957
+                    "value": -3.5
                   },
                   {
                     "id": "aPhbfCDfPQ",
@@ -282,7 +295,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": -2.4500000000000144
+                    "value": -3.5
                   },
                   {
                     "id": "AfbFGy94aZ",
@@ -514,7 +527,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": -1.57
+                    "value": 0
                   }
                 ]
               },
@@ -809,6 +822,8 @@
   },
   "definitionVersion": "0.4.0",
   "revisionHistory": [
+    "imBB6W00CdLYZNnd",
+    "4Fb826p3-0oiPmCj",
     "d4G5kW14fGZtcubT"
   ]
 }
