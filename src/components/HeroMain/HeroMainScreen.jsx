@@ -28,6 +28,7 @@ import SiriBackgroundShader from "./SiriBackgroundShader";
 import * as THREE from "three";
 import { Fluid } from "../FluidDistortion";
 import { BlendFunction } from "postprocessing";
+import Stats from "../UI/Stats";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
@@ -277,6 +278,7 @@ export default function HeroMain({
     <div id="SequenceContainer" className="h-[2500vh] w-full relative">
       <div className="h-screen sticky top-0 w-full bg-black">
         <HeroUI isAnimationRunning={isAnimationRunning} />
+        {/* <Stats /> */}
 
         <Canvas
           gl={{
@@ -284,10 +286,6 @@ export default function HeroMain({
             alpha: true,
             preserveDrawingBuffer: true,
             powerPreference: "high-performance",
-            
-
-            // toneMapping: THREE.ACESFilmicToneMapping,
-            // toneMappingExposure: 0.8,
           }}
           camera={{
             position: [0, 0, 5],
@@ -358,7 +356,7 @@ export default function HeroMain({
                 fluidColor="#07251e"
                 blend={0.3}
                 backgroundColor="#000000"
-                rgbShiftIntensity={0.1}
+                rgbShiftIntensity={0.03}
                 intensity={0.1}
                 force={0.8}
                 radius={0.7}

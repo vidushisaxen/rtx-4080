@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { SplitText } from "gsap/dist/SplitText";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import Stats from "../UI/Stats";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -9,6 +10,7 @@ export default function HeroUI({ isAnimationRunning }) {
   const titleRef = useRef(null);
   const descriptionRef = useRef(null);
   const containerRef = useRef(null);
+  const statsRef = useRef(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -97,29 +99,38 @@ export default function HeroUI({ isAnimationRunning }) {
     }
   }, [isAnimationRunning]);
 
+
   return (
-    <div
-      ref={containerRef}
-      className="h-screen w-full absolute top-0  left-0 z-[200]"
-      style={{ opacity: 0 }}
-    >
-      <div className="h-full w-full absolute flex items-end px-[4vw] pb-[6vw] gap-10 justify-start  top-0 left-0 z-[2">
-        <div className="w-[50%] ">
-          <h1
-            ref={titleRef}
-            className="text-[5vw] w-[100%] font-bold font-head leading-[1.1] text-white"
-            style={{
-              maskImage: 'linear-gradient(to right, black 0%, black 20%, black 0%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 20%, black 0%, transparent 100%)'
-            }}
+    <>
+      <div
+        ref={containerRef}
+        className="h-screen w-full absolute top-0  left-0 z-[999]"
+        style={{ opacity: 0 }}
+      >
+        <div className="h-full w-full absolute flex items-end px-[4vw] pb-[6vw] gap-10 justify-start  top-0 left-0 z-[2">
+          <div className="w-[50%] ">
+            <h1
+              ref={titleRef}
+              className="text-[5vw] w-[100%] font-bold font-head leading-[1.1] text-white"
+              style={{
+                maskImage:
+                  "linear-gradient(to right, black 0%, black 20%, black 0%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to right, black 0%, black 20%, black 0%, transparent 100%)",
+              }}
+            >
+              Beyond GPUs. <br /> Beyond Quantum.
+            </h1>
+          </div>
+          <p
+            ref={descriptionRef}
+            className="w-[21vw] text-[1vw] text-[#C8C8C8]"
           >
-            Beyond GPUs. <br /> Beyond Quantum.
-          </h1>
+            An artifact engineered for the next era of computation.
+          </p>
         </div>
-        <p ref={descriptionRef} className="w-[21vw] text-[1vw] text-[#C8C8C8]">
-          An artifact engineered for the next era of computation.
-        </p>
       </div>
-    </div>
+      <Stats ref={statsRef} />
+    </>
   );
 }

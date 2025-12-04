@@ -81,7 +81,7 @@ export const useBackgroundAudio = () => {
   useEffect(() => {
     if (typeof Audio !== "undefined") {
       if (!audioRefGlobal) {
-        audioRefGlobal = new Audio("/assets/sfx/bg.mp3");
+        audioRefGlobal = new Audio("/assets/sfx/bg2.ogg");
         audioRefGlobal.loop = true;
         audioRefGlobal.volume = 0.1; // optional
       }
