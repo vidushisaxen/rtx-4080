@@ -7,7 +7,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function ScrollTracker({ isAnimationRunning }) {
   const progressBarRef = useRef(null);
-  const finalStopperRef = useRef(null);
   const scrollTrackerRef = useRef(null);
 
   useEffect(() => {
@@ -31,9 +30,8 @@ export default function ScrollTracker({ isAnimationRunning }) {
 
   useEffect(() => {
     const progressBar = progressBarRef.current;
-    const finalStopper = finalStopperRef.current;
 
-    if (!progressBar || !finalStopper || isAnimationRunning) return;
+    if (!progressBar || isAnimationRunning) return;
 
     // Animate progress bar height based on scroll
     const progressTrigger = ScrollTrigger.create({
@@ -46,20 +44,8 @@ export default function ScrollTracker({ isAnimationRunning }) {
       },
     });
 
-    // Show final stopper when scroll is complete
-    const stopperTrigger = ScrollTrigger.create({
-      trigger: "body",
-      start: "99.5% bottom",
-      end: "bottom bottom",
-      scrub: 0.3,
-      onUpdate: (self) => {
-        gsap.set(finalStopper, { opacity: self.progress });
-      },
-    });
-
     return () => {
       progressTrigger.kill();
-      stopperTrigger.kill();
     };
   }, [isAnimationRunning]);
 
@@ -74,10 +60,6 @@ export default function ScrollTracker({ isAnimationRunning }) {
           ref={progressBarRef}
           className="w-full h-0 absolute top-0 left-1/2 -translate-x-1/2 bg-white rounded-full"
         ></div>
-        {/* <div 
-          ref={finalStopperRef}
-          className="w-[.7vw] h-[.7vw] absolute bottom-0 left-1/2 -translate-x-1/2 bg-white opacity-0 rounded-full"
-        ></div> */}
       </div>
     </div>
   );
