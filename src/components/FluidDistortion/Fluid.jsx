@@ -1,5 +1,5 @@
 import { createPortal, useFrame, useThree } from '@react-three/fiber';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Camera, Color, Mesh, Scene, Texture, Vector2, Vector3 } from 'three';
 import { ShaderPass } from 'three/examples/jsm/Addons.js';
 import { FluidEffectComponent } from './FluidEffectComponent';
@@ -29,6 +29,16 @@ export const Fluid = ({
     rgbShiftIntensity = DEFAULT_CONFIG.rgbShiftIntensity,
     rgbShiftRadius = DEFAULT_CONFIG.rgbShiftRadius,
     rgbShiftDirection = DEFAULT_CONFIG.rgbShiftDirection,
+    // Bloom parameters
+    enableBloom = DEFAULT_CONFIG.enableBloom,
+    bloomIntensity = DEFAULT_CONFIG.bloomIntensity,
+    // Random Movement parameters
+    enableRandomMovement = DEFAULT_CONFIG.enableRandomMovement,
+    randomMovementIdleThreshold = DEFAULT_CONFIG.randomMovementIdleThreshold,
+    randomMovementInterval = DEFAULT_CONFIG.randomMovementInterval,
+    randomMovementLerpFactor = DEFAULT_CONFIG.randomMovementLerpFactor,
+    randomMovementForceMultiplier = DEFAULT_CONFIG.randomMovementForceMultiplier,
+    randomMovementMargin = DEFAULT_CONFIG.randomMovementMargin,
 }) => {
     const size = useThree((three) => three.size);
     const gl = useThree((three) => three.gl);
@@ -40,10 +50,39 @@ export const Fluid = ({
     const postRef = useRef(null);
     const pointerRef = useRef(new Vector2());
     const colorRef = useRef(new Vector3());
+    const mousePositionRef = useRef(new Vector2(0.5, 0.5));
 
     const FBOs = useFBOs();
     const materials = useMaterials();
-    const splatStack = usePointer({ force });
+    const splatStack = usePointer({ 
+        force,
+        enableRandomMovement,
+        randomMovementIdleThreshold,
+        randomMovementInterval,
+        randomMovementLerpFactor,
+        randomMovementForceMultiplier,
+        randomMovementMargin,
+    });
+
+    // Track mouse position continuously for bloom effect (only if enabled)
+    useEffect(() => {
+        if (!enableBloom) return;
+
+        const handlePointerMove = (event) => {
+            const normalizedX = event.x / window.innerWidth;
+            const normalizedY = 1.0 - (event.y / window.innerHeight);
+            mousePositionRef.current.set(normalizedX, normalizedY);
+            
+            if (postRef.current && postRef.current.updateMousePosition) {
+                postRef.current.updateMousePosition(normalizedX, normalizedY);
+            }
+        };
+
+        window.addEventListener('pointermove', handlePointerMove);
+        return () => {
+            window.removeEventListener('pointermove', handlePointerMove);
+        };
+    }, [enableBloom]);
 
     const setShaderMaterial = useCallback(
         (name) => {
@@ -176,6 +215,8 @@ export const Fluid = ({
                 rgbShiftIntensity={rgbShiftIntensity}
                 rgbShiftRadius={rgbShiftRadius}
                 rgbShiftDirection={rgbShiftDirection}
+                enableBloom={enableBloom}
+                bloomIntensity={bloomIntensity}
                 ref={postRef}
                 tFluid={FBOs.density.read.texture}
             />

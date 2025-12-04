@@ -2,7 +2,7 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import { Canvas } from "@react-three/fiber";
-import { Center, Sparkles, useProgress } from "@react-three/drei";
+import { Center, Environment, Sparkles, useProgress } from "@react-three/drei";
 import {
   EffectComposer,
   Bloom,
@@ -26,9 +26,8 @@ import HeroUI from "./HeroUI";
 import { useBackgroundAudio } from "../SFX/Sounds";
 import SiriBackgroundShader from "./SiriBackgroundShader";
 import * as THREE from "three";
-import FluidCursor, { FluidScene } from "./CursorEffect";
 import { Fluid } from "../FluidDistortion";
-import { RGB_SHIFT_PRESETS } from "../FluidDistortion/constants";
+import { BlendFunction } from "postprocessing";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
@@ -179,7 +178,7 @@ export default function HeroMain({
     tl.to(
       { rippleOp: rippleOpacity },
       {
-        rippleOp: 0.2,
+        rippleOp: 1.0,
         duration: 2.0,
         delay: 0.5,
         ease: "power2.inOut",
@@ -284,8 +283,11 @@ export default function HeroMain({
             antialias: true,
             alpha: true,
             preserveDrawingBuffer: true,
-            toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: 0.8,
+            powerPreference: "high-performance",
+            
+
+            // toneMapping: THREE.ACESFilmicToneMapping,
+            // toneMappingExposure: 0.8,
           }}
           camera={{
             position: [0, 0, 5],
@@ -293,20 +295,23 @@ export default function HeroMain({
             near: 0.1,
             far: 1000,
           }}
-          dpr={[1, 2]}
-          className="h-screen relative z-12 w-full"
+          dpr={[1, 1.5]}
+          className="h-screen relative bg-black z-12 w-full"
           shadows
+          flat
+          
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
+          <Environment preset="forest" environmentIntensity={5} />
           <SheetProvider sheet={HeroMainSheet}>
             {/* Black & White Ripple Background Shader */}
-            <SiriBackgroundShader
+            {/* <SiriBackgroundShader
               opacity={rippleOpacity}
               color="#000000"
               intensity={rippleIntensity}
               speed={0.8}
-              rippleCount={3}
-            />
+              rippleCount={1}
+            /> */}
 
             <directionalLight
               position={[0, 10, 0]}
@@ -321,64 +326,52 @@ export default function HeroMain({
               distance={0}
               decay={0.2}
             />
-            <Sparkles
-              opacity={0.2}
-              color={"#00fff00"}
-              size={20}
-              position={[-7, 2.5, -7]}
-              count={10}
-              scale={3}
-              speed={0.2}
-            />
-            <Sparkles
-              opacity={0.2}
-              size={20}
-              color={"#00fff00"}
-              position={[7, 2.5, -7]}
-              count={10}
-              scale={3}
-              speed={0.2}
-            />
-            <EffectComposer>
-              <Suspense fallback={<FallBackLoader />}>
-                <Center>
-                  <group scale={0.8} ref={centerGroupRef}>
-                    <group ref={BeamLoaderRef}>
-                      <BeamLoader
-                        shaderOpacity={shaderOpacity}
-                        isModelLoaded={isModelLoaded}
-                        progress={progress}
-                        loaded={loaded}
-                        total={total}
-                      />
-                    </group>
-                    <e.group
-                      position={[0, -1.2, 0]}
-                      theatreKey="MainModelMesh"
-                      ref={modelRef}
-                    >
-                      <ActualModel
-                        toggleFanRotation={toggleFanRotation}
-                        fanRotationRef={fanRotationRef}
-                      />
-                    </e.group>
-                    {/* <ReflectiveBase /> */}
+
+            <Suspense fallback={<FallBackLoader />}>
+              <Center>
+                <group scale={0.8} ref={centerGroupRef}>
+                  <group ref={BeamLoaderRef}>
+                    <BeamLoader
+                      shaderOpacity={shaderOpacity}
+                      isModelLoaded={isModelLoaded}
+                      progress={progress}
+                      loaded={loaded}
+                      total={total}
+                    />
                   </group>
-                </Center>
-              </Suspense>
-              <Fluid 
-                fluidColor="#07251e" 
-                blend={.3}
-                rgbShiftIntensity={.1}
-                intensity={.1}
-                force={.8}
-                radius={0.5}
-                pressure={0.7}
+                  <e.group
+                    position={[0, -1.2, 0]}
+                    theatreKey="MainModelMesh"
+                    ref={modelRef}
+                  >
+                    <ActualModel
+                      toggleFanRotation={toggleFanRotation}
+                      fanRotationRef={fanRotationRef}
+                    />
+                  </e.group>
+                  <ReflectiveBase />
+                </group>
+              </Center>
+            </Suspense>
+            <EffectComposer>
+              <Fluid
+                fluidColor="#07251e"
+                blend={0.3}
+                backgroundColor="#000000"
+                rgbShiftIntensity={0.1}
+                intensity={0.1}
+                force={0.8}
+                radius={0.7}
+                pressure={0.9}
                 densityDissipation={0.91}
-                distortion={1.0}
+                distortion={0.3}
                 velocityDissipation={1.0}
                 rgbShiftRadius={0.2}
                 rgbShiftDirection={{ x: 1.0, y: 0.5 }}
+                blendFunction={BlendFunction.DIFFERENCE}
+                enableRandomMovement={true}
+                randomMovementIdleThreshold={200}
+                // enableBloom={true}
               />
             </EffectComposer>
           </SheetProvider>

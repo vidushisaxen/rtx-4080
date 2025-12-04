@@ -25,6 +25,11 @@ export const FluidEffectComponent = React.forwardRef((props, ref) => {
             if (effectRef.current && effectRef.current.updateTime) {
                 effectRef.current.updateTime(time);
             }
+        },
+        updateMousePosition: (mouseX, mouseY) => {
+            if (effectRef.current && effectRef.current.updateMousePosition) {
+                effectRef.current.updateMousePosition(mouseX, mouseY);
+            }
         }
     }), []);
 

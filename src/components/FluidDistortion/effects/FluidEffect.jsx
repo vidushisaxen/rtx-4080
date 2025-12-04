@@ -19,6 +19,11 @@ uniform float uRgbShiftRadius;
 uniform vec2 uRgbShiftDirection;
 uniform float uRgbShiftTime;
 
+// Bloom uniforms
+uniform vec2 uMousePosition;
+uniform float uBloomIntensity;
+uniform float uEnableBloom;
+
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
 
     vec3 fluidColor = texture2D(tFluid, uv).rgb;
@@ -64,18 +69,51 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
 
     vec4 computedBgColor = uShowBackground != 0.0 ? vec4(uBackgroundColor, 1.0) : vec4(0.0, 0.0, 0.0, 0.0);
 
-    outputColor = mix(inputTexture, colorForFluidEffect, intensity);
-
-    vec4 computedFluidColor = mix(inputTexture, colorForFluidEffect, uBlend * 0.01);
-
+    float enhancedIntensity = intensity;
     vec4 finalColor;
 
-    if(inputTexture.a < 0.1) {
-        finalColor = mix(computedBgColor, colorForFluidEffect, intensity);
-    } else {
-        finalColor = mix(computedFluidColor, computedBgColor, 1.0 - inputTexture.a);
-    }
+    // Apply bloom effect only if enabled
+    if (uEnableBloom > 0.5) {
+        // Calculate distance from mouse position for bloom enhancement
+        float mouseDistance = distance(uv, uMousePosition);
+        float mouseInfluence = 1.0 - smoothstep(0.0, 0.4, mouseDistance);
+        
+        // Enhanced bloom intensity based on mouse movement and fluid intensity
+        // Higher bloom intensity near mouse and in areas with more fluid
+        float bloomMultiplier = 1.0 + (uBloomIntensity * mouseInfluence * fluidIntensity * 3.0);
+        enhancedIntensity = intensity * bloomMultiplier;
+        
+        // Create bloom glow effect - brighter and more saturated near mouse
+        vec3 bloomColor = colorForFluidEffect.rgb * (1.0 + bloomMultiplier * 0.5);
+        float bloomAmount = enhancedIntensity * mouseInfluence * 0.8;
 
+        outputColor = mix(inputTexture, colorForFluidEffect, enhancedIntensity);
+
+        vec4 computedFluidColor = mix(inputTexture, colorForFluidEffect, uBlend * 0.01);
+
+        if(inputTexture.a < 0.1) {
+            finalColor = mix(computedBgColor, colorForFluidEffect, enhancedIntensity);
+        } else {
+            finalColor = mix(computedFluidColor, computedBgColor, 1.0 - inputTexture.a);
+        }
+
+        // Apply bloom glow effect with screen blend mode (additive blending for glow)
+        // Screen blend: 1 - (1 - a) * (1 - b) = a + b - a*b
+        vec3 bloomGlow = bloomColor * bloomAmount;
+        finalColor.rgb = finalColor.rgb + bloomGlow - (finalColor.rgb * bloomGlow);
+    } else {
+        // Standard rendering without bloom
+        outputColor = mix(inputTexture, colorForFluidEffect, intensity);
+
+        vec4 computedFluidColor = mix(inputTexture, colorForFluidEffect, uBlend * 0.01);
+
+        if(inputTexture.a < 0.1) {
+            finalColor = mix(computedBgColor, colorForFluidEffect, intensity);
+        } else {
+            finalColor = mix(computedFluidColor, computedBgColor, 1.0 - inputTexture.a);
+        }
+    }
+    
     outputColor = finalColor;
 }`;
 
@@ -95,6 +133,10 @@ export class FluidEffect extends Effect {
             uRgbShiftRadius: new Uniform(props.rgbShiftRadius || 1.0),
             uRgbShiftDirection: new Uniform(new Vector2(props.rgbShiftDirection?.x || 1.0, props.rgbShiftDirection?.y || 0.0)),
             uRgbShiftTime: new Uniform(0.0),
+            // Bloom uniforms
+            uMousePosition: new Uniform(new Vector2(0.5, 0.5)),
+            uBloomIntensity: new Uniform(props.bloomIntensity || 1.0),
+            uEnableBloom: new Uniform(props.enableBloom ? 1.0 : 0.0),
         };
 
         super('FluidEffect', compositeFrag, {
@@ -132,6 +174,18 @@ export class FluidEffect extends Effect {
         if (this.state.rgbShiftDirection !== undefined) {
             this.updateUniform('uRgbShiftDirection', new Vector2(this.state.rgbShiftDirection.x, this.state.rgbShiftDirection.y));
         }
+        
+        // Update bloom uniforms
+        if (this.state.enableBloom !== undefined) {
+            this.updateUniform('uEnableBloom', this.state.enableBloom ? 1.0 : 0.0);
+        }
+        if (this.state.bloomIntensity !== undefined) {
+            this.updateUniform('uBloomIntensity', this.state.bloomIntensity);
+        }
+    }
+
+    updateMousePosition(mouseX, mouseY) {
+        this.updateUniform('uMousePosition', new Vector2(mouseX, mouseY));
     }
 
     updateTime(time) {

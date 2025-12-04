@@ -74,10 +74,10 @@ export default function ScrollTracker({ isAnimationRunning }) {
           ref={progressBarRef}
           className="w-full h-0 absolute top-0 left-1/2 -translate-x-1/2 bg-white rounded-full"
         ></div>
-        <div 
+        {/* <div 
           ref={finalStopperRef}
           className="w-[.7vw] h-[.7vw] absolute bottom-0 left-1/2 -translate-x-1/2 bg-white opacity-0 rounded-full"
-        ></div>
+        ></div> */}
       </div>
     </div>
   );
