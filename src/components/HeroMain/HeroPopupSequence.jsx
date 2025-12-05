@@ -14,8 +14,8 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
   useEffect(() => {
     const timeline1 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "15% center",
-      end: "20% center",
+      start: "7.5% center",
+      end: "10% center",
       markers: false,
       onEnter: () => {
         setFirstPopUpToggler(true);
@@ -34,8 +34,8 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
 
     const timeline2 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "35% center",
-      end: "40% center",
+      start: "17.5% center",
+      end: "20% center",
       markers: false,
       onEnter: () => {
         setSecondPopUpToggler(true);
@@ -56,8 +56,8 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
 
     const timeline3 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "55% center",
-      end: "60% center",
+      start: "27.5% center",
+      end: "30% center",
       markers: false,
       onEnter: () => {
         setThirdPopUpToggler(true);
@@ -75,8 +75,8 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
 
     const timeline4 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "75% center",
-      end: "80% center",
+      start: "37.5% center",
+      end: "40% center",
       markers: false,
       onEnter: () => {
         setFourthPopUpToggler(true);

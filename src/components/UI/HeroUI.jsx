@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { SplitText } from "gsap/dist/SplitText";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import Stats from "../UI/Stats";
+import Specifications from "./Specifications";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -10,8 +10,6 @@ export default function HeroUI({ isAnimationRunning }) {
   const titleRef = useRef(null);
   const descriptionRef = useRef(null);
   const containerRef = useRef(null);
-  const statsRef = useRef(null);
-
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -104,7 +102,7 @@ export default function HeroUI({ isAnimationRunning }) {
     <>
       <div
         ref={containerRef}
-        className="h-screen w-full absolute top-0  left-0 z-[999]"
+        className="h-screen w-full pointer-events-none absolute top-0  left-0 z-[999]"
         style={{ opacity: 0 }}
       >
         <div className="h-full w-full absolute flex items-end px-[4vw] pb-[6vw] gap-10 justify-start  top-0 left-0 z-[2">
@@ -130,7 +128,7 @@ export default function HeroUI({ isAnimationRunning }) {
           </p>
         </div>
       </div>
-      {/* <Stats ref={statsRef} /> */}
+      <Specifications />
     </>
   );
 }

@@ -20,15 +20,15 @@ import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
 import { getProject } from "@theatre/core";
 import { editable as e, SheetProvider } from "@theatre/r3f";
-import SequenceAnim from "../../theatre/Anim1.json";
+import SequenceAnim from "../../theatre/Anim3.json";
 import SparkleBtn from "../BtnComponent/SparkleBtn";
-import HeroUI from "./HeroUI";
+import HeroUI from "../UI/HeroUI";
 import { useBackgroundAudio } from "../SFX/Sounds";
 import SiriBackgroundShader from "./SiriBackgroundShader";
 import * as THREE from "three";
 import { Fluid } from "../FluidDistortion";
 import { BlendFunction } from "postprocessing";
-import Stats from "../UI/Stats";
+import Stats from "../UI/Specifications";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
@@ -122,6 +122,7 @@ export default function HeroMain({
   //     studio.extend(extension);
   //   }
   // }, []);
+
   // SEQUENCE SCROLL
   useEffect(() => {
     if (typeof window === "undefined" || !HeroMainSheet) return;
@@ -129,11 +130,11 @@ export default function HeroMain({
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#SequenceContainer",
       start: "top top",
-      end: "99.5% bottom",
+      end: "60% bottom",
       scrub: true,
       markers: false,
       onUpdate: (self) => {
-        const animationTime = self.progress * 18.08;
+        const animationTime = self.progress * 21.08;
         HeroMainSheet.sequence.position = animationTime;
       },
       onEnter: () => {
@@ -275,7 +276,7 @@ export default function HeroMain({
     }
   };
   return (
-    <div id="SequenceContainer" className="h-[2500vh] w-full relative">
+    <div id="SequenceContainer" className="h-[8000vh] w-full relative">
       <div className="h-screen sticky top-0 w-full bg-black">
         <HeroUI isAnimationRunning={isAnimationRunning} />
         {/* <Stats /> */}
@@ -372,6 +373,7 @@ export default function HeroMain({
                 // enableBloom={true}
               />
             </EffectComposer>
+            
           </SheetProvider>
         </Canvas>
         <HeroPopupSequence toggleFanRotation={toggleFanRotation} />
