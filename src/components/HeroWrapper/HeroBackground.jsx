@@ -268,7 +268,7 @@ const ShaderMaterial = () => {
   );
 };
 
-export default function App() {
+export default function HeroBackground() {
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#111111', margin: 0, padding: 0, overflow: 'hidden', position: 'fixed', top: 0, left: 0 }}>
       <Canvas camera={{ position: [0, 0, 2], fov: 55}} style={{ width: '100%', height: '100%', background:"#111111" }}>

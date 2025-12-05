@@ -130,7 +130,7 @@ export default function HeroUI({ isAnimationRunning }) {
           </p>
         </div>
       </div>
-      <Stats ref={statsRef} />
+      {/* <Stats ref={statsRef} /> */}
     </>
   );
 }
