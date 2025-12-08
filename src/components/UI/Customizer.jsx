@@ -23,7 +23,7 @@ export default function Customizer({ materialsSetting, setMaterialsSetting }) {
         onEnter: () => {
           gsap.to(containerRef.current, {
             opacity: 1,
-            duration: 1,
+            duration: 1, 
             ease: "power2.out",
             visibility: "visible",
             pointerEvents: "auto",
