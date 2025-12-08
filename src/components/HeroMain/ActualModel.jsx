@@ -1,15 +1,71 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useEnhancedMaterials } from "./MaterialsConfig";
 import { useThree } from "@react-three/fiber";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { gsap } from "gsap";
+import * as THREE from "three";
 gsap.registerPlugin(ScrollTrigger);
 import { editable as e } from "@theatre/r3f";
-export default function ActualModel({ toggleFanRotation, fanRotationRef }) {
+
+
+export default function ActualModel({ toggleFanRotation, fanRotationRef, materialsSetting, setMaterialsSetting }) {
   const { nodes, materials } = useGLTF("/assets/models/BeamModel.glb");
   const enhancedMaterials = useEnhancedMaterials(materials);
   const { camera } = useThree();
+
+  // Animated material for the metal frame. Cloned from the baked material so
+  // it keeps all textures, then tweened to three different looks.
+  const baseFrameMaterial = useMemo(() => {
+    const source = enhancedMaterials.main_material || materials.main_material;
+    if (!source) return null;
+    return source.clone ? source.clone() : source;
+  }, [enhancedMaterials.main_material, materials.main_material]);
+
+  const frameMaterial = useMemo(() => {
+    if (baseFrameMaterial?.clone) {
+      const cloned = baseFrameMaterial.clone();
+      cloned.name = "frame_material_animated";
+      return cloned;
+    }
+    return new THREE.MeshStandardMaterial({
+      color: "#ffffff",
+      metalness: 0.95,
+      roughness: 0.35,
+      side: THREE.DoubleSide,
+    });
+  }, [baseFrameMaterial]);
+
+  const frameVariants = useMemo(
+    () => ({
+      1: { color: new THREE.Color("#ffffff"), metalness: 0.95, roughness: 0.35 },
+      2: { color: new THREE.Color("#FFD700"), metalness: 0.9, roughness: 0.1 },
+      3: { color: new THREE.Color("#600060"), metalness: 0.88, roughness: 0.18 },
+    }),
+    []
+  );
+
+  useEffect(() => {
+    if (!frameMaterial) return;
+    const target = frameVariants[materialsSetting] || frameVariants[1];
+
+    gsap.to(frameMaterial.color, {
+      r: target.color.r,
+      g: target.color.g,
+      b: target.color.b,
+      duration: 0.9,
+      ease: "power2.out",
+    });
+
+    gsap.to(frameMaterial, {
+      metalness: target.metalness,
+      roughness: target.roughness,
+      duration: 0.9,
+      ease: "power2.out",
+    });
+  }, [frameMaterial, frameVariants, materialsSetting]);
+
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -153,6 +209,7 @@ export default function ActualModel({ toggleFanRotation, fanRotationRef }) {
                       receiveShadow
                       geometry={nodes.Metal_Case_main_material_0.geometry}
                       material={
+                        frameMaterial ||
                         enhancedMaterials.main_material ||
                         materials.main_material
                       }

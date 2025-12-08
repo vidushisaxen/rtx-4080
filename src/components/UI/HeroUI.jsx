@@ -3,10 +3,11 @@ import { gsap } from "gsap";
 import { SplitText } from "gsap/dist/SplitText";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Specifications from "./Specifications";
+import Customizer from "./Customizer";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
-export default function HeroUI({ isAnimationRunning }) {
+export default function HeroUI({ isAnimationRunning, materialsSetting, setMaterialsSetting }) {
   const titleRef = useRef(null);
   const descriptionRef = useRef(null);
   const containerRef = useRef(null);
@@ -129,6 +130,7 @@ export default function HeroUI({ isAnimationRunning }) {
         </div>
       </div>
       <Specifications />
+      <Customizer materialsSetting={materialsSetting} setMaterialsSetting={setMaterialsSetting} />
     </>
   );
 }

@@ -20,7 +20,7 @@ import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
 import { getProject } from "@theatre/core";
 import { editable as e, SheetProvider } from "@theatre/r3f";
-import SequenceAnim from "../../theatre/Anim3.json";
+import SequenceAnim from "../../theatre/AnimFinal2.json";
 import SparkleBtn from "../BtnComponent/SparkleBtn";
 import HeroUI from "../UI/HeroUI";
 import { useBackgroundAudio } from "../SFX/Sounds";
@@ -29,11 +29,13 @@ import * as THREE from "three";
 import { Fluid } from "../FluidDistortion";
 import { BlendFunction } from "postprocessing";
 import Stats from "../UI/Specifications";
+
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
   isAnimationRunning,
   setIsAnimationRunning,
+
 }) {
   const lenis = useLenis();
   const BeamLoaderRef = useRef();
@@ -52,6 +54,7 @@ export default function HeroMain({
   const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet(
     "Hero Main Sheet"
   );
+  const [materialsSetting, setMaterialsSetting] = useState(1);
 
   // Get background audio control
   const { PlaySoundBackground } = useBackgroundAudio();
@@ -72,7 +75,7 @@ export default function HeroMain({
           y: 0,
           duration: 1,
           ease: "power2.out",
-          delay: 6,
+          delay: 2,
         }
       );
     }
@@ -130,11 +133,11 @@ export default function HeroMain({
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#SequenceContainer",
       start: "top top",
-      end: "60% bottom",
+      end: "70% bottom",
       scrub: true,
       markers: false,
       onUpdate: (self) => {
-        const animationTime = self.progress * 21.08;
+        const animationTime = self.progress * 26.08;
         HeroMainSheet.sequence.position = animationTime;
       },
       onEnter: () => {
@@ -278,7 +281,7 @@ export default function HeroMain({
   return (
     <div id="SequenceContainer" className="h-[8000vh] w-full relative">
       <div className="h-screen sticky top-0 w-full bg-black">
-        <HeroUI isAnimationRunning={isAnimationRunning} />
+        <HeroUI isAnimationRunning={isAnimationRunning} materialsSetting={materialsSetting} setMaterialsSetting={setMaterialsSetting} />  
         {/* <Stats /> */}
 
         <Canvas
@@ -302,6 +305,7 @@ export default function HeroMain({
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
           <Environment preset="forest" environmentIntensity={5} />
+          
           <SheetProvider sheet={HeroMainSheet}>
             {/* Black & White Ripple Background Shader */}
             {/* <SiriBackgroundShader
@@ -311,6 +315,7 @@ export default function HeroMain({
               speed={0.8}
               rippleCount={1}
             /> */}
+            {/* <ambientLight intensity={0.5} /> */}
 
             <directionalLight
               position={[0, 10, 0]}
@@ -324,6 +329,14 @@ export default function HeroMain({
               color="#ffffff"
               distance={0}
               decay={0.2}
+            />
+            <e.pointLight
+              theatreKey="PointLight"              
+              theatreX={10}
+              theatreY={10}
+              theatreZ={5}
+              intensity={100}
+              color="#ffffff"
             />
 
             <Suspense fallback={<FallBackLoader />}>
@@ -344,6 +357,8 @@ export default function HeroMain({
                     ref={modelRef}
                   >
                     <ActualModel
+                      setMaterialsSetting={setMaterialsSetting}
+                      materialsSetting={materialsSetting}
                       toggleFanRotation={toggleFanRotation}
                       fanRotationRef={fanRotationRef}
                     />

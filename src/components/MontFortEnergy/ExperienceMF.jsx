@@ -17,7 +17,7 @@ const EnergyShaderMaterial = ({ config = {} }) => {
     flowSpeed: 0.4,
     flowIntensity: 1.5,
     baselineIntensity: 0.3,
-    lineWidth: 0.03,
+    lineWidth: 0.1,
     glowIntensity: 0.1,
     turbulence: 0,
   };
@@ -27,19 +27,25 @@ const EnergyShaderMaterial = ({ config = {} }) => {
 
   useFrame((state) => {
     if (materialRef.current) {
+      materialRef.current.depthFunc = THREE.AlwaysDepth;
+
       materialRef.current.uniforms.uTime.value =
         state.clock.elapsedTime * finalConfig.timeMultiplier;
     }
   });
+  
 
   return (
     <shaderMaterial
       ref={materialRef}
       transparent
+      sortObjects={true}
+      precision="highp"
+      precisionHighp={true}
       side={THREE.DoubleSide}
       blending={THREE.AdditiveBlending}
       depthWrite={false}
-      depthTest={true}
+      depthTest={false}
       polygonOffset
       polygonOffsetFactor={1}
       polygonOffsetUnits={1}
@@ -59,16 +65,23 @@ const EnergyShaderMaterial = ({ config = {} }) => {
         varying vec2 vUv;
         varying vec3 vWorldPosition;
         varying vec3 vNormal;
+        varying float vDistance;
         
         void main() {
           vUv = uv;
           vNormal = normalize(normalMatrix * normal);
           vec4 worldPosition = modelMatrix * vec4(position, 1.0);
           vWorldPosition = worldPosition.xyz;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+          vDistance = -viewPosition.z;
+          gl_Position = projectionMatrix * viewPosition;
         }
       `}
       fragmentShader={`
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+        
         uniform float uTime;
         uniform vec3 uColor;
         uniform vec3 uBaseLineColor;
@@ -82,6 +95,7 @@ const EnergyShaderMaterial = ({ config = {} }) => {
         varying vec2 vUv;
         varying vec3 vWorldPosition;
         varying vec3 vNormal;
+        varying float vDistance;
         
         float random(vec2 st) {
           return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
@@ -102,6 +116,8 @@ const EnergyShaderMaterial = ({ config = {} }) => {
         }
         
         void main() {
+          // Keep UV-based line direction to maintain original line orientation
+          // But use screen-space derivatives to handle perspective distortion
           float linePosition = fract(vUv.x * uNumLines);
           float lineIndex = floor(vUv.x * uNumLines);
           
@@ -109,13 +125,28 @@ const EnergyShaderMaterial = ({ config = {} }) => {
           float turbulence = noise(vec2(lineIndex * 0.1, vUv.y * 2.0 + uTime * 0.2)) * uTurbulence;
           float adjustedLinePos = linePosition + turbulence;
           
-          // Create line
-          float lineCenter = 0.5;
-          float halfWidth = uLineWidth * 0.5;
-          float distanceFromCenter = abs(adjustedLinePos - lineCenter);
-          float baseLine = 1.0 - smoothstep(halfWidth - 0.01, halfWidth + 0.01, distanceFromCenter);
+          // Screen-space line width calculation using UV derivatives
+          // fwidth(vUv.x) gives us how much UV.x changes per screen pixel
+          // This accounts for perspective distortion automatically
+          float uvGradient = fwidth(vUv.x * uNumLines);
+          float screenPixel = uvGradient;
+          float minThickness = screenPixel * 1.5;
           
-          // Simplified flow with only 2 particles instead of 3
+          // Convert line width to screen-space using the UV gradient
+          // This ensures consistent pixel width regardless of perspective angle
+          float baseScreenWidth = uLineWidth * uNumLines;
+          float adjustedLineWidth = max(baseScreenWidth * screenPixel, minThickness);
+
+          
+          // Create line with improved anti-aliasing
+          float lineCenter = 0.5;
+          float halfWidth = adjustedLineWidth * 0.5;
+          float distanceFromCenter = abs(adjustedLinePos - lineCenter);
+          float edgeSoftness = max(screenPixel, adjustedLineWidth * 0.1);
+
+          float baseLine = 1.0 - smoothstep(halfWidth - edgeSoftness, halfWidth + edgeSoftness, distanceFromCenter);
+          
+          // Sperm-like flow with head and tail
           float randomSeed1 = random(vec2(lineIndex, 1.0));
           float randomSeed2 = random(vec2(lineIndex, 2.0));
           
@@ -128,38 +159,66 @@ const EnergyShaderMaterial = ({ config = {} }) => {
           float flow1 = fract(vUv.y + uTime * uFlowSpeed * randomSpeed1 + phaseOffset1);
           float flow2 = fract(vUv.y + uTime * uFlowSpeed * randomSpeed2 + phaseOffset2);
           
-          // Simplified particles
           float intensity1 = 0.6 + randomSeed1 * 0.8;
           float intensity2 = 0.5 + randomSeed2 * 0.6;
           
-          float particleSize1 = 0.03 + randomSeed1 * 0.02;
-          float particleSize2 = 0.025 + randomSeed2 * 0.015;
+          // Sperm 1: Head and Tail
+          float headPosition1 = 0.95;
+          float headSize1 = 0.04 + randomSeed1 * 0.03; // Head size
+          float headDistance1 = abs(flow1 - headPosition1);
           
-          float particle1 = exp(-pow((flow1 - 0.95) / particleSize1, 2.0)) * intensity1;
-          float particle2 = exp(-pow((flow2 - 0.92) / particleSize2, 2.0)) * intensity2;
+          // Head: larger, brighter circular shape
+          float head1 = exp(-pow(headDistance1 / headSize1, 2.0)) * intensity1 * 1.5;
           
-          // Simplified trails
-          float trail1 = 0.0;
-          float trail2 = 0.0;
-          
-          if (flow1 < 0.95) {
-            float trailPos = (0.95 - flow1) / 0.4;
-            trail1 = exp(-trailPos * 3.0) * smoothstep(1.0, 0.0, trailPos) * intensity1 * 0.6;
+          // Tail: long tapering tail behind the head
+          float tail1 = 0.0;
+          if (flow1 < headPosition1) {
+            float tailLength = 1.5; // Length of tail - much longer flowing lines
+            float tailPos = (headPosition1 - flow1) / tailLength;
+            if (tailPos <= 1.0) {
+              // Taper the tail smoothly from head to end
+              float tailWidth = mix(headSize1 * 0.6, 0.0, pow(tailPos, 1.5));
+              float tailDistance = headDistance1;
+              // Create a smooth tail that tapers
+              tail1 = exp(-pow(tailDistance / tailWidth, 2.0)) * 
+                      (1.0 - tailPos) * // Fade out along tail
+                      exp(-tailPos * 1.5) * // Additional exponential decay
+                      intensity1 * 0.8;
+            }
           }
           
-          if (flow2 < 0.92) {
-            float trailPos = (0.92 - flow2) / 0.35;
-            trail2 = exp(-trailPos * 2.5) * smoothstep(1.0, 0.0, trailPos) * intensity2 * 0.5;
+          // Sperm 2: Head and Tail
+          float headPosition2 = 0.92;
+          float headSize2 = 0.035 + randomSeed2 * 0.025;
+          float headDistance2 = abs(flow2 - headPosition2);
+          
+          // Head
+          float head2 = exp(-pow(headDistance2 / headSize2, 2.0)) * intensity2 * 1.5;
+          
+          // Tail
+          float tail2 = 0.0;
+          if (flow2 < headPosition2) {
+            float tailLength = 1.4; // Much longer flowing lines
+            float tailPos = (headPosition2 - flow2) / tailLength;
+            if (tailPos <= 1.0) {
+              float tailWidth = mix(headSize2 * 0.6, 0.0, pow(tailPos, 1.5));
+              float tailDistance = headDistance2;
+              tail2 = exp(-pow(tailDistance / tailWidth, 2.0)) * 
+                      (1.0 - tailPos) *
+                      exp(-tailPos * 1.5) *
+                      intensity2 * 0.8;
+            }
           }
           
-          float energyFlow = (particle1 + trail1) + (particle2 + trail2);
+          float energyFlow = (head1 + tail1) + (head2 + tail2);
           float flowingLine = baseLine * energyFlow * uFlowIntensity;
           float staticLine = baseLine * uBaselineIntensity;
           float finalLine = staticLine + flowingLine;
           
-          // Simplified glow
-          float glowRadius = uLineWidth * 3.0;
-          float glowFalloff = 1.0 - smoothstep(0.0, glowRadius, distanceFromCenter);
+          // Simplified glow with distance adjustment
+          float glowRadius = adjustedLineWidth * 3.0;
+          float glowEdgeSoftness = max(0.01, glowRadius * 0.2);
+          float glowFalloff = 1.0 - smoothstep(0.0, glowRadius + glowEdgeSoftness, distanceFromCenter);
           float glow = energyFlow * glowFalloff * uGlowIntensity;
           
           // Vertical fade
@@ -309,7 +368,7 @@ export default function ExperienceMF({
     <>
       <group
         {...props}
-        rotation={[degToRad(0), Math.PI, 0]}
+        rotation={[degToRad(-0), Math.PI, 0]}
         scale={0.05}
         dispose={null}
       >
@@ -320,11 +379,10 @@ export default function ExperienceMF({
             receiveShadow
             geometry={nodes.EnergyBackGround.geometry}
             renderOrder={0}
-            position={[0, -65.224, -0]}
+            position={[0, -65.224, 0]}
           >
             <AuroraSkyShaderMaterial config={auroraConfig} />
           </mesh>
-        
         </group>
         <group position={[0, -50, 0]}>
           <mesh
@@ -339,8 +397,9 @@ export default function ExperienceMF({
 
           <mesh
             castShadow
+            
             receiveShadow
-            rotation={[0, degToRad(0), 0]}
+            rotation={[0, degToRad(-.8), 0]}
             geometry={nodes.EnergyCone.geometry}
             position={[0, 4.21, 0]}
             renderOrder={1}
