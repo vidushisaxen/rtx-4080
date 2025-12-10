@@ -103,7 +103,7 @@ export default function HeroUI({ isAnimationRunning, materialsSetting, setMateri
     <>
       <div
         ref={containerRef}
-        className="h-screen w-full pointer-events-none absolute top-0  left-0 z-[999]"
+        className="h-screen w-full pointer-events-none fixed top-0  left-0 z-[999]"
         style={{ opacity: 0 }}
       >
         <div className="h-full w-full absolute flex items-end px-[4vw] pb-[6vw] gap-10 justify-start  top-0 left-0 z-[2">

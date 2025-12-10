@@ -66,8 +66,8 @@ export default function Specifications() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: "#SequenceContainer",
-        start: "47% top",
-        end: "65% bottom",
+        start: "65% top",
+        end: "88% bottom",
         scrub: true,
         onEnter: () => {
           gsap.to(titleSplit.chars, {
@@ -158,7 +158,7 @@ export default function Specifications() {
     <section
       ref={sectionRef}
       id="SpecificationsSection"
-      className="h-screen w-full pointer-events-none absolute top-0 flex items-center justify-between left-0 z-[999]"
+      className="h-screen w-full pointer-events-none fixed top-0 flex items-center justify-between left-0 z-[999]"
     >
       <div className="w-full flex items-end p-[5vw] h-full">
         <h2

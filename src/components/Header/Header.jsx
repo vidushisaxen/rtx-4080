@@ -42,7 +42,7 @@ export default function NavBar({ isAnimationRunning }) {
   return (
     <nav 
       ref={navRef}
-      className="fixed top-0 left-0 z-[999] flex items-center justify-between w-full px-[5vw] py-[3vw]"
+      className="fixed top-0 left-0 !z-[99999] flex items-center justify-between w-full px-[5vw] py-[3vw]"
       style={{ opacity: 0 }}
     >
       <Link href={"/"} className="h-auto w-[10vw] ">

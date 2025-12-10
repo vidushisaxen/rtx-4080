@@ -53,7 +53,7 @@ export default function ScrollTracker({ isAnimationRunning }) {
     <div 
       ref={scrollTrackerRef}
       id="ScrollTracker" 
-      className="w-fit opacity-0 h-screen min-w-[10vw] pointer-events-none fixed top-0 right-0 flex items-center justify-center z-[999]"
+      className="w-fit opacity-0 h-screen min-w-[10vw] pointer-events-none fixed top-0 right-0 flex items-center justify-center z-[99999]"
     >
       <div className="w-[1.5px] h-[50vh] relative rounded-full bg-[#494949]">
         <div 

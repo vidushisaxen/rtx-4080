@@ -33,7 +33,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed px-15 py-5 top-0 left-0 w-screen z-[300] transform transition-transform duration-300 ${
+        className={`fixed px-15 z-[9999] py-5 top-0 left-0 w-screen z-[300] transform transition-transform duration-300 ${
           hidden ? "-translate-y-full" : "translate-y-0"
         }`}
       >

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import NavBar from "./Header/Header";
 import ScrollTracker from "./ScrollTracker/ScrollTracker";
 import HeroMain from "./HeroMain/HeroMainScreen";
+import ChromaVignetteEffect from "./QuantumWalletBG/QuantumWallet";
 
 
 
@@ -60,6 +61,8 @@ export default function UILayout({ children }) {
       <NavBar isAnimationRunning={isAnimationRunning} />
       <HeroMain isAnimationRunning={isAnimationRunning} setIsAnimationRunning={setIsAnimationRunning} />
       {children}
+      <ChromaVignetteEffect/>
+      
     </>
   );
 }

@@ -3,12 +3,7 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import { Canvas } from "@react-three/fiber";
 import { Center, Environment, Sparkles, useProgress } from "@react-three/drei";
-import {
-  EffectComposer,
-  Bloom,
-  Noise,
-  Vignette,
-} from "@react-three/postprocessing";
+import { EffectComposer } from "@react-three/postprocessing";
 import BeamLoader from "./BeamLoader";
 import ActualModel from "./ActualModel";
 import FallBackLoader from "./FallBackLoader";
@@ -24,18 +19,15 @@ import SequenceAnim from "../../theatre/AnimFinal2.json";
 import SparkleBtn from "../BtnComponent/SparkleBtn";
 import HeroUI from "../UI/HeroUI";
 import { useBackgroundAudio } from "../SFX/Sounds";
-import SiriBackgroundShader from "./SiriBackgroundShader";
-import * as THREE from "three";
 import { Fluid } from "../FluidDistortion";
 import { BlendFunction } from "postprocessing";
-import Stats from "../UI/Specifications";
+import ChromaVignetteEffect from "../QuantumWalletBG/QuantumWallet";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroMain({
   isAnimationRunning,
   setIsAnimationRunning,
-
 }) {
   const lenis = useLenis();
   const BeamLoaderRef = useRef();
@@ -45,6 +37,7 @@ export default function HeroMain({
   const [shaderOpacity, setShaderOpacity] = useState(1.0);
   const [lightIntensity, setLightIntensity] = useState(0);
   const [pointLightIntensity, setPointLightIntensity] = useState(0);
+  const [environmentIntensity, setEnvironmentIntensity] = useState(0);
   const [rippleOpacity, setRippleOpacity] = useState(0.05);
   const [rippleIntensity, setRippleIntensity] = useState(0.2);
   const modelRef = useRef(null);
@@ -133,7 +126,7 @@ export default function HeroMain({
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#SequenceContainer",
       start: "top top",
-      end: "70% bottom",
+      end: "100% bottom",
       scrub: true,
       markers: false,
       onUpdate: (self) => {
@@ -238,6 +231,21 @@ export default function HeroMain({
       0
     );
 
+    // ANIMATE ENVIRONMENT LIGHT INTENSITY FROM 0 to 5
+    tl.to(
+      { envIntensity: environmentIntensity },
+      {
+        envIntensity: 5,
+        duration: 2.0,
+        delay: 1.0,
+        ease: "power2.out",
+        onUpdate: function () {
+          setEnvironmentIntensity(this.targets()[0].envIntensity);
+        },
+      },
+      0
+    );
+
     // Fade out button
     tl.to(
       ".expBtn",
@@ -278,10 +286,31 @@ export default function HeroMain({
       });
     }
   };
+
+  useEffect(() => {
+    const handleEnter = (event) => {
+      if (event.key === 'Enter') {
+        handleClickEnterExperience();
+      }
+    };
+
+    document.addEventListener('keydown', handleEnter);
+
+    return () => {
+      document.removeEventListener('keydown', handleEnter);
+    };
+  }, [handleClickEnterExperience])
+  
   return (
-    <div id="SequenceContainer" className="h-[8000vh] w-full relative">
-      <div className="h-screen sticky top-0 w-full bg-black">
-        <HeroUI isAnimationRunning={isAnimationRunning} materialsSetting={materialsSetting} setMaterialsSetting={setMaterialsSetting} />  
+    <>
+    <HeroUI
+    isAnimationRunning={isAnimationRunning}
+    materialsSetting={materialsSetting}
+    setMaterialsSetting={setMaterialsSetting}
+  />
+    <div id="SequenceContainer" className="h-[4200vh] bg-black w-full relative">
+      <div className="h-screen sticky top-0 z-[100] w-full ">
+      
         {/* <Stats /> */}
 
         <Canvas
@@ -298,25 +327,17 @@ export default function HeroMain({
             far: 1000,
           }}
           dpr={[1, 1.5]}
-          className="h-screen relative bg-black z-12 w-full"
+          className="h-screen relative z-12 w-full"
           shadows
           flat
-          
           resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
         >
-          <Environment preset="forest" environmentIntensity={5} />
-          
-          <SheetProvider sheet={HeroMainSheet}>
-            {/* Black & White Ripple Background Shader */}
-            {/* <SiriBackgroundShader
-              opacity={rippleOpacity}
-              color="#000000"
-              intensity={rippleIntensity}
-              speed={0.8}
-              rippleCount={1}
-            /> */}
-            {/* <ambientLight intensity={0.5} /> */}
+          <Environment
+            preset="forest"
+            environmentIntensity={environmentIntensity}
+          />
 
+          <SheetProvider sheet={HeroMainSheet}>
             <directionalLight
               position={[0, 10, 0]}
               intensity={lightIntensity}
@@ -330,6 +351,8 @@ export default function HeroMain({
               distance={0}
               decay={0.2}
             />
+
+            {/* POINT LIGHT FOR THE EXPERIENCE */}
             <e.pointLight
               theatreKey="PointLight"              
               theatreX={10}
@@ -367,11 +390,13 @@ export default function HeroMain({
                 </group>
               </Center>
             </Suspense>
+
             <EffectComposer>
               <Fluid
                 fluidColor="#07251e"
                 blend={0.3}
-                backgroundColor="#000000"
+                // backgroundColor="#000000"
+                showBackground={false}
                 rgbShiftIntensity={0.03}
                 intensity={0.1}
                 force={0.8}
@@ -388,7 +413,6 @@ export default function HeroMain({
                 // enableBloom={true}
               />
             </EffectComposer>
-            
           </SheetProvider>
         </Canvas>
         <HeroPopupSequence toggleFanRotation={toggleFanRotation} />
@@ -396,7 +420,7 @@ export default function HeroMain({
         {isModelLoaded && (
           <div
             ref={buttonRef}
-            className="absolute expBtn bottom-15 left-0 w-full h-20 z-999 flex items-center justify-center opacity-0"
+            className="absolute expBtn bottom-15 left-0 w-full h-20 z-[9999] flex items-center justify-center opacity-0"
           >
             <SparkleBtn
               colorTheme="white"
@@ -407,5 +431,7 @@ export default function HeroMain({
         )}
       </div>
     </div>
+    </>
+
   );
 }

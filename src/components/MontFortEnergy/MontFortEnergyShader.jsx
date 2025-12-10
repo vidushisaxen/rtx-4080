@@ -116,7 +116,7 @@ function RendererConfig() {
 export default function MontFortEnergyShader() {
   return (
     <div
-      className="bg-black relative h-screen w-full"
+      className="bg-black relative f h-screen w-full"
       style={{ width: "100vw", height: "100vh" }}
     >
       <div
