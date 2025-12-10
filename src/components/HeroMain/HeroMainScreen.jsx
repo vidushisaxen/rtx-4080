@@ -386,7 +386,7 @@ export default function HeroMain({
                       fanRotationRef={fanRotationRef}
                     />
                   </e.group>
-                  <ReflectiveBase />
+                  {/* <ReflectiveBase />  */}
                 </group>
               </Center>
             </Suspense>
