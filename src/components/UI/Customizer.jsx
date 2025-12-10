@@ -175,7 +175,7 @@ export default function Customizer({ materialsSetting, setMaterialsSetting }) {
             <div
               ref={(el) => (boxesRef.current[0] = el)}
               onClick={() => setMaterialsSetting(1)}
-              className={`h-[6vw] w-[6vw] border rounded-[1vw] bg-black/10 backdrop-blur-xl cursor-pointer  flex items-center justify-center border-white/20 ${
+              className={`h-[6vw] w-[6vw] border rounded-[1vw] bg-zinc-950 backdrop-blur-xl cursor-pointer  flex items-center justify-center border-white/20 ${
                 materialsSetting === 1 ? "border-white/80" : ""
               }`}
             >
@@ -184,7 +184,7 @@ export default function Customizer({ materialsSetting, setMaterialsSetting }) {
             <div
               ref={(el) => (boxesRef.current[1] = el)}
               onClick={() => setMaterialsSetting(2)}
-              className={`h-[6vw] w-[6vw] border rounded-[1vw] bg-black/10 backdrop-blur-xl cursor-pointer  flex items-center justify-center border-white/20 ${
+              className={`h-[6vw] w-[6vw] border rounded-[1vw] bg-zinc-950 backdrop-blur-xl cursor-pointer  flex items-center justify-center border-white/20 ${
                 materialsSetting === 2 ? "border-white/80" : ""
               }`}
             >
@@ -193,7 +193,7 @@ export default function Customizer({ materialsSetting, setMaterialsSetting }) {
             <div
               ref={(el) => (boxesRef.current[2] = el)}
               onClick={() => setMaterialsSetting(3)}
-              className={`h-[6vw] w-[6vw] border rounded-[1vw] bg-black/10 backdrop-blur-xl cursor-pointer  flex items-center justify-center border-white/20 ${
+              className={`h-[6vw] w-[6vw] border rounded-[1vw] bg-zinc-950 backdrop-blur-xl cursor-pointer  flex items-center justify-center border-white/20 ${
                 materialsSetting === 3 ? "border-white/80" : ""
               }`}
             >
