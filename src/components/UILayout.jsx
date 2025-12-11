@@ -208,7 +208,7 @@ export default function UILayout({ children }) {
       <ChromaVignetteEffect isAnimationRunning={isAnimationRunning} LineArtActive={LineArtActive} />
       {/* <Transition runAnimation={transitionRunning}/> */}
 
-      <div className="fixed top-0 items-center justify-center left-0 w-full h-full flex flex-col z-[10] !pointer-events-none">
+      <div className="fixed top-0 items-center justify-center left-0 w-full h-full flex flex-col z-[99] !pointer-events-none">
         <div 
           ref={(el) => (borderRefs.current[0] = el)}
           className="w-full h-[25%] border-b border-t relative border-white/10"
