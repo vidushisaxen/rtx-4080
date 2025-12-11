@@ -4,8 +4,9 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import AudioCanvas from "../AudioCanvas/AudioCanvas";
 
-export default function NavBar({ isAnimationRunning }) {
+export default function NavBar({ isAnimationRunning , LineArtActive }) {
   const navRef = useRef(null);
+  const logoRef = useRef(null);
 
   useEffect(() => {
     if (!navRef.current) return;
@@ -39,6 +40,18 @@ export default function NavBar({ isAnimationRunning }) {
     }
   }, [isAnimationRunning]);
 
+  // Handle theme changes based on LineArtActive
+  useEffect(() => {
+    if (!logoRef.current) return;
+
+    // Animate logo color change
+    gsap.to(logoRef.current, {
+      filter: LineArtActive ? "invert(1)" : "invert(0)",
+      duration: .5,
+      ease: "power2.inOut",
+    });
+  }, [LineArtActive]);
+
   return (
     <nav 
       ref={navRef}
@@ -47,14 +60,15 @@ export default function NavBar({ isAnimationRunning }) {
     >
       <Link href={"/"} className="h-auto w-[10vw] ">
         <Image
+          ref={logoRef}
           src={"/assets/icons/Hyperiux.svg"}
           height={100}
           width={100}
           alt="rtx-logo"
-          className="h-full text-white w-full"
+          className="h-full text-white w-full transition-all duration-1000"
         />
       </Link>
-    <AudioCanvas />
+    <AudioCanvas LineArtActive={LineArtActive} />
     </nav>
   );
 }

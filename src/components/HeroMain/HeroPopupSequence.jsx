@@ -15,7 +15,7 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
     const timeline1 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
       start: "7.5% center",
-      end: "13% center",
+      end: "11% center",
       markers: false,
       onEnter: () => {
         setFirstPopUpToggler(true);
@@ -34,8 +34,8 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
 
     const timeline2 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "22% center",
-      end: "28.5% center",
+      start: "13% center",
+      end: "18.5% center",
       markers: false,
       onEnter: () => {
         setSecondPopUpToggler(true);
@@ -56,8 +56,8 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
 
     const timeline3 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "35% center",
-      end: "41.5% center",
+      start: "21% center",
+      end: "28% center",
       markers: false,
       onEnter: () => {
         setThirdPopUpToggler(true);
@@ -75,8 +75,8 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
 
     const timeline4 = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "48% center",
-      end: "54.5% center",
+      start: "34% center",
+      end: "39% center",
       markers: false,
       onEnter: () => {
         setFourthPopUpToggler(true);
@@ -104,7 +104,7 @@ export default function HeroPopupSequence({ toggleFanRotation }) {
     <>
 
       {/* POPUP 1 - GPU Core */}
-      <div className="h-fit w-fit absolute top-[25%] right-[15%] -translate-x-1/2 -translate-y-1/2 z-200">
+      <div className="h-fit w-fit absolute top-[25%]  right-[15%] -translate-x-1/2 -translate-y-1/2 z-200">
         <InfoPopup 
           isOpen={firstPopUpToggler}
           origin="bottom-left"

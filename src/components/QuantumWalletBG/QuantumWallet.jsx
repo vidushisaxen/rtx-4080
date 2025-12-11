@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useCallback } from "react";
+import { gsap } from "gsap";
 
 const CONFIG = {
   DEFAULT_CONTROLS: {
@@ -9,20 +10,28 @@ const CONFIG = {
     color2: "#09536d50",
     color3: "#09536d50",
   },
+  LINEART_CONTROLS: {
+    baseRadius: { value: 0.2 },
+    easing: { value: 0.4 },
+    color1: "#ff6b3550",
+    color2: "#ff6b3550", 
+    color3: "#ff6b3550",
+  },
   CIRCLE_COUNT: {
     MAX: 6,
   },
   ANIMATION: {
-    LERP_FACTOR: 0.01,
+    LERP_FACTOR: 0.001,
   },
   BLOB_POSITIONS: [
     {
       x: 0.5,
       y: 0.5,
-      radiusFactor: 0.6,
+      radiusFactor: 0.,
       colorIndex: 0,
-      interactive: true,
+      interactive: false, //MAIN
       opacity: .5,
+      animatedX: -0.5, // Starting position when animating from left
     }, // Mouse-following blob
     {
       x: -0.05,
@@ -31,6 +40,7 @@ const CONFIG = {
       colorIndex: 0,
       interactive: false,
       opacity: 1.0,
+      animatedX: -1.5, // Starting position when animating from left
     }, //ACTIVE DENSE BLOB
     // Left side arc blob
     {
@@ -45,6 +55,7 @@ const CONFIG = {
       baseY: 0.3,
       amplitude: 0.4,
       frequency: 0.5,
+      animatedX: -1.2, // Starting position when animating from left
     },
     {
       x: -0.1,
@@ -58,6 +69,7 @@ const CONFIG = {
       baseY: 0.5,
       amplitude: 0.4,
       frequency: 0.7,
+      animatedX: -1.2, // Starting position when animating from left
     },
     // Right side arc blob
     {
@@ -72,6 +84,7 @@ const CONFIG = {
       baseY: 0.4,
       amplitude: 0.3,
       frequency: 0.6,
+      animatedX: 2.2, // Starting position when animating from right
     },
     {
       x: 1.1,
@@ -85,6 +98,7 @@ const CONFIG = {
       baseY: 0.6,
       amplitude: 0.3,
       frequency: 0.8,
+      animatedX: 2.2, // Starting position when animating from right
     },
   ],
   VIGNETTE: {
@@ -409,7 +423,7 @@ function initializeWebGL(canvas, width, height) {
   return { gl, program, uniformLocations };
 }
 
-function initializeCircles(width, height) {
+function initializeCircles(width, height, isAnimateRunning = true) {
   const circles = [];
   const colors = [
     hexToRGB(CONFIG.DEFAULT_CONTROLS.color1),
@@ -419,20 +433,34 @@ function initializeCircles(width, height) {
 
   // Initialize circles based on predefined positions
   CONFIG.BLOB_POSITIONS.forEach((blobConfig, index) => {
+    const finalX = blobConfig.x * width;
+    const finalY = blobConfig.y * height;
+    
+    // If animation is not running, start from sides and animate to final position
+    let startX = finalX;
+    if (!isAnimateRunning) {
+      if (blobConfig.animatedX !== undefined) {
+        startX = blobConfig.animatedX * width;
+      }
+    }
+
     circles.push({
-      x: blobConfig.x * width,
-      y: blobConfig.y * height,
+      x: startX,
+      y: finalY,
+      targetX: finalX,
+      targetY: finalY,
       radiusFactor: blobConfig.radiusFactor,
       colorIndex: blobConfig.colorIndex,
       interactive: blobConfig.interactive,
       opacity: blobConfig.opacity,
-      initialX: blobConfig.x * width,
-      initialY: blobConfig.y * height,
+      initialX: finalX,
+      initialY: finalY,
       isArcBlob: blobConfig.isArcBlob || false,
       side: blobConfig.side,
       baseY: blobConfig.baseY,
       amplitude: blobConfig.amplitude,
       frequency: blobConfig.frequency,
+      isAnimating: !isAnimateRunning,
     });
   });
 
@@ -452,10 +480,29 @@ function updateCirclePositions(
   return circles.map((circle, index) => {
     if (circle.interactive) {
       // Mouse-following circle
+      let targetX = mousePos.x;
+      let targetY = mousePos.y;
+      
+      // If still animating from side, animate to target position first
+      if (circle.isAnimating) {
+        targetX = circle.targetX;
+        targetY = circle.targetY;
+        
+        // Check if close enough to target to stop animating
+        const distToTarget = Math.sqrt(
+          Math.pow(circle.x - circle.targetX, 2) + 
+          Math.pow(circle.y - circle.targetY, 2)
+        );
+        
+        if (distToTarget < 10) {
+          circle.isAnimating = false;
+        }
+      }
+      
       return {
         ...circle,
-        x: circle.x + (mousePos.x - circle.x) * smoothControls.easing,
-        y: circle.y + (mousePos.y - circle.y) * smoothControls.easing,
+        x: circle.x + (targetX - circle.x) * smoothControls.easing,
+        y: circle.y + (targetY - circle.y) * smoothControls.easing,
         radius: baseRadius * circle.radiusFactor,
       };
     } else if (circle.isArcBlob) {
@@ -463,29 +510,62 @@ function updateCirclePositions(
       const oscillation = Math.sin(time * circle.frequency) * circle.amplitude;
       const newY = (circle.baseY + oscillation) * height;
       
+      let targetX = circle.initialX;
+      
+      // If still animating from side, animate to target position first
+      if (circle.isAnimating) {
+        // Check if close enough to target to stop animating
+        const distToTarget = Math.abs(circle.x - circle.targetX);
+        
+        if (distToTarget < 10) {
+          circle.isAnimating = false;
+        }
+      }
+      
       return {
         ...circle,
-        x: circle.initialX,
+        x: circle.isAnimating ? 
+          circle.x + (circle.targetX - circle.x) * smoothControls.easing : 
+          targetX,
         y: newY,
         radius: baseRadius * circle.radiusFactor,
       };
     } else {
-      // Static circles - keep them in their configured positions
+      // Static circles - animate to their configured positions if needed
+      let targetX = circle.initialX;
+      let targetY = circle.initialY;
+      
+      // If still animating from side, animate to target position
+      if (circle.isAnimating) {
+        // Check if close enough to target to stop animating
+        const distToTarget = Math.sqrt(
+          Math.pow(circle.x - circle.targetX, 2) + 
+          Math.pow(circle.y - circle.targetY, 2)
+        );
+        
+        if (distToTarget < 10) {
+          circle.isAnimating = false;
+        }
+        
+        targetX = circle.targetX;
+        targetY = circle.targetY;
+      }
+      
       return {
         ...circle,
-        x: circle.initialX,
-        y: circle.initialY,
+        x: circle.isAnimating ? 
+          circle.x + (targetX - circle.x) * smoothControls.easing : 
+          targetX,
+        y: circle.isAnimating ? 
+          circle.y + (targetY - circle.y) * smoothControls.easing : 
+          targetY,
         radius: baseRadius * circle.radiusFactor,
       };
     }
   });
 }
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
-const ChromaVignetteEffect = ({ opacity = 1.0 }) => {
+const ChromaVignetteEffect = ({ opacity = 1.0, LineArtActive, isAnimateRunning = true }) => {
   const canvasRef = useRef(null);
   const circlesRef = useRef([]);
   const sparklesRef = useRef([]);
@@ -494,60 +574,76 @@ const ChromaVignetteEffect = ({ opacity = 1.0 }) => {
   const mousePos = useRef({ x: 0, y: 0 });
   const startTime = useRef(Date.now());
   const lastFrameTime = useRef(Date.now());
+  const prevIsAnimateRunning = useRef(isAnimateRunning);
+
+  // Use a single color state that gets animated directly
+  const currentColor = useRef(hexToRGB(CONFIG.DEFAULT_CONTROLS.color1));
 
   const targetControls = useRef({
     baseRadius: CONFIG.DEFAULT_CONTROLS.baseRadius.value,
     easing: CONFIG.DEFAULT_CONTROLS.easing.value,
-    color1: hexToRGB(CONFIG.DEFAULT_CONTROLS.color1),
-    color2: hexToRGB(CONFIG.DEFAULT_CONTROLS.color2),
-    color3: hexToRGB(CONFIG.DEFAULT_CONTROLS.color3),
   });
 
   const smoothControls = useRef({
     baseRadius: CONFIG.DEFAULT_CONTROLS.baseRadius.value,
     easing: CONFIG.DEFAULT_CONTROLS.easing.value,
-    color1: hexToRGB(CONFIG.DEFAULT_CONTROLS.color1),
-    color2: hexToRGB(CONFIG.DEFAULT_CONTROLS.color2),
-    color3: hexToRGB(CONFIG.DEFAULT_CONTROLS.color3),
   });
 
+  // Handle isAnimateRunning changes
+  useEffect(() => {
+    if (prevIsAnimateRunning.current !== isAnimateRunning && !isAnimateRunning) {
+      // When isAnimateRunning becomes false, reinitialize circles to start from sides
+      const canvas = canvasRef.current;
+      if (canvas) {
+        circlesRef.current = initializeCircles(canvas.width, canvas.height, isAnimateRunning);
+      }
+    }
+    prevIsAnimateRunning.current = isAnimateRunning;
+  }, [isAnimateRunning]);
+
+  // Update target controls based on LineArtActive prop using GSAP
+  useEffect(() => {
+    const controls = LineArtActive ? CONFIG.LINEART_CONTROLS : CONFIG.DEFAULT_CONTROLS;
+    const targetColor = hexToRGB(controls.color1);
+    
+    // Kill any existing color animations to prevent conflicts
+    gsap.killTweensOf(currentColor.current);
+    
+    // Animate the color directly with a smooth transition
+    gsap.to(currentColor.current, {
+      duration: 1.2,
+      ease: "power2.inOut",
+      0: targetColor[0], // R
+      1: targetColor[1], // G
+      2: targetColor[2], // B
+    });
+
+    // Animate other properties
+    gsap.to(smoothControls.current, {
+      duration: 1.0,
+      ease: "power2.inOut",
+      baseRadius: controls.baseRadius.value,
+      easing: controls.easing.value,
+    });
+
+    targetControls.current = {
+      baseRadius: controls.baseRadius.value,
+      easing: controls.easing.value,
+    };
+  }, [LineArtActive]);
+
   const getColorPalette = useCallback(() => {
-    return [
-      smoothControls.current.color1,
-      smoothControls.current.color1,
-      smoothControls.current.color1,
+    // Return the same color for all three slots to ensure consistency
+    const color = [
+      currentColor.current[0],
+      currentColor.current[1],
+      currentColor.current[2]
     ];
+    return [color, color, color];
   }, []);
 
   const updateSmoothControls = useCallback(() => {
-    const { LERP_FACTOR } = CONFIG.ANIMATION;
-
-    smoothControls.current.baseRadius = lerp(
-      smoothControls.current.baseRadius,
-      targetControls.current.baseRadius,
-      LERP_FACTOR
-    );
-    smoothControls.current.easing = lerp(
-      smoothControls.current.easing,
-      targetControls.current.easing,
-      LERP_FACTOR
-    );
-
-    smoothControls.current.color1 = lerpColor(
-      smoothControls.current.color1,
-      targetControls.current.color1,
-      LERP_FACTOR
-    );
-    smoothControls.current.color2 = lerpColor(
-      smoothControls.current.color2,
-      targetControls.current.color2,
-      LERP_FACTOR
-    );
-    smoothControls.current.color3 = lerpColor(
-      smoothControls.current.color3,
-      targetControls.current.color3,
-      LERP_FACTOR
-    );
+    // GSAP handles all the smooth transitions now
   }, []);
 
   const render = useCallback(() => {
@@ -695,7 +791,7 @@ const ChromaVignetteEffect = ({ opacity = 1.0 }) => {
     if (glContext) {
       const { uniformLocations } = glContext;
       uniformLocationsRef.current = { uniformLocations };
-      circlesRef.current = initializeCircles(canvas.width, canvas.height);
+      circlesRef.current = initializeCircles(canvas.width, canvas.height, isAnimateRunning);
       sparklesRef.current = initializeSparkles(canvas.width, canvas.height);
       mousePos.current = { x: canvas.width / 2, y: canvas.height / 2 };
       lastFrameTime.current = Date.now(); // Initialize frame time
@@ -714,7 +810,7 @@ const ChromaVignetteEffect = ({ opacity = 1.0 }) => {
       const gl = canvas.getContext("webgl");
       if (gl) {
         gl.viewport(0, 0, canvas.width, canvas.height);
-        circlesRef.current = initializeCircles(canvas.width, canvas.height);
+        circlesRef.current = initializeCircles(canvas.width, canvas.height, isAnimateRunning);
         sparklesRef.current = initializeSparkles(canvas.width, canvas.height);
       }
     };
@@ -731,25 +827,11 @@ const ChromaVignetteEffect = ({ opacity = 1.0 }) => {
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [render, handleCursorMove]);
+  }, [render, handleCursorMove, isAnimateRunning]);
 
   return (
     <>
-      <div className="fixed top-0 items-center justify-center left-0 w-full h-full flex flex-col z-[10] !pointer-events-none">
-        <div className="w-full  h-[25%] border-b border-t relative border-white/10">
-          <p className="absolute top-[-1.5vw] left-[1vw] text-white/15 text-[.7vw] ">
-            HYPERIUX 1000" TPS
-          </p>
-          <p className="absolute bottom-[.5vw] left-[1vw] text-white/15 text-[.7vw] ">
-            ハイペリウクス システム
-          </p>
-        </div>
-        <div className="w-full h-[25%] border-b  relative border-white/10">
-          <p className="absolute bottom-[.5vw] left-[1vw] text-white/15 text-[.7vw] ">
-            1 DOGE = 1000 HYPERIUX
-          </p>
-        </div>
-      </div>
+      
       <canvas
         ref={canvasRef}
         className="fixed top-0 left-0 w-full h-full pointer-events-none z-[99]"

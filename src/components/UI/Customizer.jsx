@@ -144,6 +144,14 @@ export default function Customizer({ materialsSetting, setMaterialsSetting }) {
     hideContainer();
   };
 
+  const handleScrollLeave = () => {
+    hideContainer();
+  };
+
+  const handleScrollEnterBack = () => {
+    showContainer();
+  };
+
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -152,10 +160,12 @@ export default function Customizer({ materialsSetting, setMaterialsSetting }) {
     // Create scroll trigger animation
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#SequenceContainer",
-      start: "92% top",
-      end: "100% bottom",
+      start: "79% top",
+      end: "94% bottom",
       onEnter: handleScrollEnter,
       onLeaveBack: handleScrollLeaveBack,
+      onLeave: handleScrollLeave,
+      onEnterBack: handleScrollEnterBack,
     });
 
   }, []);

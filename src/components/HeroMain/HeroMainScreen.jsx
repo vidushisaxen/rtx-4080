@@ -15,7 +15,7 @@ import studio from "@theatre/studio";
 import extension from "@theatre/r3f/dist/extension";
 import { getProject } from "@theatre/core";
 import { editable as e, SheetProvider } from "@theatre/r3f";
-import SequenceAnim from "../../theatre/AnimFinal2.json";
+import SequenceAnim from "../../theatre/final2.json";
 import SparkleBtn from "../BtnComponent/SparkleBtn";
 import HeroUI from "../UI/HeroUI";
 import { useBackgroundAudio } from "../SFX/Sounds";
@@ -28,6 +28,8 @@ gsap.registerPlugin(ScrollTrigger);
 export default function HeroMain({
   isAnimationRunning,
   setIsAnimationRunning,
+  LineArtActive,
+  setLineArtActive,
 }) {
   const lenis = useLenis();
   const BeamLoaderRef = useRef();
@@ -42,14 +44,15 @@ export default function HeroMain({
   const [rippleIntensity, setRippleIntensity] = useState(0.2);
   const modelRef = useRef(null);
   const fanRotationRef = useRef(null);
+  const fanRotationRef2 = useRef(null);
   const { progress, loaded, total } = useProgress();
   const isModelLoaded = progress === 100;
   const HeroMainSheet = getProject("HeroMain", { state: SequenceAnim }).sheet(
     "Hero Main Sheet"
   );
   const [materialsSetting, setMaterialsSetting] = useState(1);
+  const [experienceStarted, setExperienceStarted] = useState(false);
 
-  // Get background audio control
   const { PlaySoundBackground } = useBackgroundAudio();
 
   // Show button smoothly when model is loaded
@@ -130,7 +133,7 @@ export default function HeroMain({
       scrub: true,
       markers: false,
       onUpdate: (self) => {
-        const animationTime = self.progress * 26.08;
+        const animationTime = self.progress * 41.08;
         HeroMainSheet.sequence.position = animationTime;
       },
       onEnter: () => {
@@ -154,112 +157,144 @@ export default function HeroMain({
 
   // ENTER EXPERIENCE BUTTON
   const handleClickEnterExperience = () => {
-    // Start background audio when entering the experience
-    PlaySoundBackground(true);
+    gsap.to("#LoaderOverlayLayer", {
+      opacity: 1,
+      duration: 1,
+      ease: "power2.out",
+    });
 
-    const tl = gsap.timeline();
+    // ANIMATE TEXT HERE
+    gsap.fromTo("#LoaderOverlayLayer p", {
+      opacity: 0,
+      filter: "blur(20px)",
+    }, {
+      opacity: 1,
+      duration: 1,
+      delay:.5,
+      ease: "power2.in",
+      filter: "blur(0px)",
+    });
 
-    // Fade out beam loader shader
-    tl.to(
-      { opacity: shaderOpacity },
-      {
-        opacity: 0,
-        duration: 1.5,
-        ease: "power2.out",
-        onUpdate: function () {
-          setShaderOpacity(this.targets()[0].opacity);
+    setTimeout(() => {
+      PlaySoundBackground(true);
+      setExperienceStarted(true);
+
+      const tl = gsap.timeline();
+
+      // Fade out beam loader shader
+      tl.to(
+        { opacity: shaderOpacity },
+        {
+          opacity: 0,
+          duration: 1.5,
+          ease: "power2.out",
+          onUpdate: function () {
+            setShaderOpacity(this.targets()[0].opacity);
+          },
+        }
+      );
+
+      // Smoothly animate ripple background appearance
+      tl.to(
+        { rippleOp: rippleOpacity },
+        {
+          rippleOp: 1.0,
+          duration: 2.0,
+          delay: 0.5,
+          ease: "power2.inOut",
+          onUpdate: function () {
+            setRippleOpacity(this.targets()[0].rippleOp);
+          },
         },
-      }
-    );
+        0
+      );
 
-    // Smoothly animate ripple background appearance
-    tl.to(
-      { rippleOp: rippleOpacity },
-      {
-        rippleOp: 1.0,
-        duration: 2.0,
-        delay: 0.5,
-        ease: "power2.inOut",
-        onUpdate: function () {
-          setRippleOpacity(this.targets()[0].rippleOp);
+      // Animate ripple intensity
+      tl.to(
+        { rippleInt: rippleIntensity },
+        {
+          rippleInt: 1.2,
+          duration: 2.5,
+          delay: 0.8,
+          ease: "power2.inOut",
+          onUpdate: function () {
+            setRippleIntensity(this.targets()[0].rippleInt);
+          },
         },
-      },
-      0
-    );
+        0
+      );
 
-    // Animate ripple intensity
-    tl.to(
-      { rippleInt: rippleIntensity },
-      {
-        rippleInt: 1.2,
-        duration: 2.5,
-        delay: 0.8,
-        ease: "power2.inOut",
-        onUpdate: function () {
-          setRippleIntensity(this.targets()[0].rippleInt);
+      // INCREASE LIGHT INTENSITY FROM 0 to 4
+      tl.to(
+        { intensity: lightIntensity },
+        {
+          intensity: 4,
+          duration: 1.5,
+          delay: 1.5,
+          ease: "power2.out",
+          onUpdate: function () {
+            setLightIntensity(this.targets()[0].intensity);
+          },
         },
-      },
-      0
-    );
+        0
+      );
 
-    // INCREASE LIGHT INTENSITY FROM 0 to 4
-    tl.to(
-      { intensity: lightIntensity },
-      {
-        intensity: 4,
-        duration: 1.5,
-        delay: 1.5,
-        ease: "power2.out",
-        onUpdate: function () {
-          setLightIntensity(this.targets()[0].intensity);
+      // INCREASE POINT LIGHT INTENSITY FROM 0 to 2
+      tl.to(
+        { pointIntensity: pointLightIntensity },
+        {
+          pointIntensity: 0.4,
+          duration: 1.5,
+          ease: "power2.out",
+          onUpdate: function () {
+            setPointLightIntensity(this.targets()[0].pointIntensity);
+          },
         },
-      },
-      0
-    );
+        0
+      );
 
-    // INCREASE POINT LIGHT INTENSITY FROM 0 to 2
-    tl.to(
-      { pointIntensity: pointLightIntensity },
-      {
-        pointIntensity: 0.4,
-        duration: 1.5,
-        ease: "power2.out",
-        onUpdate: function () {
-          setPointLightIntensity(this.targets()[0].pointIntensity);
+      // ANIMATE ENVIRONMENT LIGHT INTENSITY FROM 0 to 5
+      tl.to(
+        { envIntensity: environmentIntensity },
+        {
+          envIntensity: 5,
+          duration: 2.0,
+          delay: 1.0,
+          ease: "power2.out",
+          onUpdate: function () {
+            setEnvironmentIntensity(this.targets()[0].envIntensity);
+          },
         },
-      },
-      0
-    );
+        0
+      );
 
-    // ANIMATE ENVIRONMENT LIGHT INTENSITY FROM 0 to 5
-    tl.to(
-      { envIntensity: environmentIntensity },
-      {
-        envIntensity: 5,
-        duration: 2.0,
-        delay: 1.0,
-        ease: "power2.out",
-        onUpdate: function () {
-          setEnvironmentIntensity(this.targets()[0].envIntensity);
+      // Fade out button
+      tl.to(
+        ".expBtn",
+        {
+          opacity: 0,
+          duration: 1.5,
+          ease: "power2.out",
+          onComplete: () => {
+            setIsAnimationRunning(false);
+            lenis.start();
+            gsap.to("#LoaderOverlayLayer p", {
+              opacity: 0,
+              duration: 1,
+              ease: "power2.in",
+              filter: "blur(20px)",
+            });
+            gsap.to("#LoaderOverlayLayer", {
+              opacity: 0,
+              duration: 1,
+              delay:1,
+              ease: "power2.out",
+            });
+          },
         },
-      },
-      0
-    );
-
-    // Fade out button
-    tl.to(
-      ".expBtn",
-      {
-        opacity: 0,
-        duration: 1.5,
-        ease: "power2.out",
-        onComplete: () => {
-          setIsAnimationRunning(false);
-          lenis.start();
-        },
-      },
-      "<"
-    );
+        "<"
+      );
+    }, 1000);
   };
 
   // FAN ROTATION
@@ -268,15 +303,21 @@ export default function HeroMain({
 
     if (value) {
       // Start continuous rotation
-      gsap.to(fanRotationRef.current.rotation, {
-        z: "+=12.28", // 2 * Math.PI for full rotation
-        duration: 2,
-        repeat: -1,
-        ease: "none",
-      });
+      gsap.to(
+        [fanRotationRef.current.rotation, fanRotationRef2.current.rotation],
+        {
+          z: "+=12.28", // 2 * Math.PI for full rotation
+          duration: 2,
+          repeat: -1,
+          ease: "none",
+        }
+      );
     } else {
       // Stop rotation smoothly
-      gsap.killTweensOf(fanRotationRef.current.rotation);
+      gsap.killTweensOf([
+        fanRotationRef.current.rotation,
+        fanRotationRef2.current.rotation,
+      ]);
       gsap.to(fanRotationRef.current.rotation, {
         z:
           Math.round(fanRotationRef.current.rotation.z / (2 * Math.PI)) *
@@ -289,149 +330,174 @@ export default function HeroMain({
 
   useEffect(() => {
     const handleEnter = (event) => {
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         handleClickEnterExperience();
       }
     };
 
-    document.addEventListener('keydown', handleEnter);
+    document.addEventListener("keydown", handleEnter);
 
     return () => {
-      document.removeEventListener('keydown', handleEnter);
+      document.removeEventListener("keydown", handleEnter);
     };
-  }, [handleClickEnterExperience])
-  
+  }, [handleClickEnterExperience]);
+
+  // BACKGROUND TRANSITION - Fixed to properly handle color changes
+  useEffect(() => {
+    const sequenceContainer = document.getElementById("SequenceContainer");
+    if (sequenceContainer) {
+      gsap.to(sequenceContainer, {
+        backgroundColor: LineArtActive ? "#ffffff" : "#000000",
+        duration: 0.5,
+        ease: "power2.inOut",
+      });
+    }
+  }, [LineArtActive]);
+
   return (
     <>
-    <HeroUI
-    isAnimationRunning={isAnimationRunning}
-    materialsSetting={materialsSetting}
-    setMaterialsSetting={setMaterialsSetting}
-  />
-    <div id="SequenceContainer" className="h-[4200vh] bg-black w-full relative">
-      <div className="h-screen sticky top-0 z-[100] w-full ">
-      
-        {/* <Stats /> */}
-
-        <Canvas
-          gl={{
-            antialias: true,
-            alpha: true,
-            preserveDrawingBuffer: true,
-            powerPreference: "high-performance",
-          }}
-          camera={{
-            position: [0, 0, 5],
-            fov: 40,
-            near: 0.1,
-            far: 1000,
-          }}
-          dpr={[1, 1.5]}
-          className="h-screen relative z-12 w-full"
-          shadows
-          flat
-          resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
-        >
-          <Environment
-            preset="forest"
-            environmentIntensity={environmentIntensity}
-          />
-
-          <SheetProvider sheet={HeroMainSheet}>
-            <directionalLight
-              position={[0, 10, 0]}
-              intensity={lightIntensity}
-              color="#ffffff"
-            />
-            <pointLight
-              ref={pointLightRef}
-              position={[0, 0, 5]}
-              intensity={pointLightIntensity}
-              color="#ffffff"
-              distance={0}
-              decay={0.2}
-            />
-
-            {/* POINT LIGHT FOR THE EXPERIENCE */}
-            <e.pointLight
-              theatreKey="PointLight"              
-              theatreX={10}
-              theatreY={10}
-              theatreZ={5}
-              intensity={100}
-              color="#ffffff"
-            />
-
-            <Suspense fallback={<FallBackLoader />}>
-              <Center>
-                <group scale={0.8} ref={centerGroupRef}>
-                  <group ref={BeamLoaderRef}>
-                    <BeamLoader
-                      shaderOpacity={shaderOpacity}
-                      isModelLoaded={isModelLoaded}
-                      progress={progress}
-                      loaded={loaded}
-                      total={total}
-                    />
-                  </group>
-                  <e.group
-                    position={[0, -1.2, 0]}
-                    theatreKey="MainModelMesh"
-                    ref={modelRef}
-                  >
-                    <ActualModel
-                      setMaterialsSetting={setMaterialsSetting}
-                      materialsSetting={materialsSetting}
-                      toggleFanRotation={toggleFanRotation}
-                      fanRotationRef={fanRotationRef}
-                    />
-                  </e.group>
-                  {/* <ReflectiveBase />  */}
-                </group>
-              </Center>
-            </Suspense>
-
-            <EffectComposer>
-              <Fluid
-                fluidColor="#07251e"
-                blend={0.3}
-                // backgroundColor="#000000"
-                showBackground={false}
-                rgbShiftIntensity={0.03}
-                intensity={0.1}
-                force={0.8}
-                radius={0.7}
-                pressure={0.9}
-                densityDissipation={0.91}
-                distortion={0.3}
-                velocityDissipation={1.0}
-                rgbShiftRadius={0.2}
-                rgbShiftDirection={{ x: 1.0, y: 0.5 }}
-                blendFunction={BlendFunction.DIFFERENCE}
-                enableRandomMovement={true}
-                randomMovementIdleThreshold={200}
-                // enableBloom={true}
-              />
-            </EffectComposer>
-          </SheetProvider>
-        </Canvas>
-        <HeroPopupSequence toggleFanRotation={toggleFanRotation} />
-
-        {isModelLoaded && (
-          <div
-            ref={buttonRef}
-            className="absolute expBtn bottom-15 left-0 w-full h-20 z-[9999] flex items-center justify-center opacity-0"
-          >
-            <SparkleBtn
-              colorTheme="white"
-              onClick={handleClickEnterExperience}
-              children="Enter the Experience"
-            />
-          </div>
-        )}
+      <div
+        id="LoaderOverlayLayer"
+        className="fixed top-0 left-0 w-full h-full z-[9999] opacity-0 flex items-center justify-center bg-black pointer-events-none"
+      >
+        <p className="text-[2vw] font-bold leading-[1.1] text-white/80 text-center">HYPERIUX</p>
       </div>
-    </div>
-    </>
+      <HeroUI
+        isAnimationRunning={isAnimationRunning}
+        materialsSetting={materialsSetting}
+        setMaterialsSetting={setMaterialsSetting}
+      />
+      <div id="SequenceContainer" className="h-[6500vh] w-full relative">
+        <div className="h-screen sticky top-0 z-[100] w-full ">
+          {/* <Stats /> */}
 
+          <Canvas
+            gl={{
+              antialias: true,
+              alpha: true,
+              preserveDrawingBuffer: true,
+              powerPreference: "high-performance",
+            }}
+            camera={{
+              position: [0, 0, 5],
+              fov: 40,
+              near: 0.1,
+              far: 1000,
+            }}
+            dpr={[1, 1.5]}
+            className="h-screen relative z-12 w-full"
+            shadows
+            flat
+            resize={{ scroll: false, debounce: { scroll: 50, resize: 0 } }}
+          >
+            {/* {experienceStarted && (
+              <Environment
+                preset="forest"
+                environmentIntensity={environmentIntensity}
+              />
+            )} */}
+
+            <SheetProvider sheet={HeroMainSheet}>
+              <directionalLight
+                position={[0, 10, 0]}
+                intensity={lightIntensity}
+                color="#ffffff"
+              />
+              {experienceStarted && (
+                <pointLight
+                  ref={pointLightRef}
+                  position={[0, 0, 5]}
+                  intensity={pointLightIntensity}
+                  color="#ffffff"
+                  distance={0}
+                  decay={0.2}
+                />
+              )}
+
+              {/* POINT LIGHT FOR THE EXPERIENCE */}
+              {/* {experienceStarted && (
+                <e.pointLight
+                  theatreKey="PointLight"
+                  theatreX={10}
+                  theatreY={10}
+                  theatreZ={5}
+                  intensity={100}
+                  color="#ffffff"
+                />
+              )} */}
+
+              <Suspense fallback={<FallBackLoader />}>
+                <Center>
+                  <group scale={0.8} ref={centerGroupRef}>
+                    <group ref={BeamLoaderRef}>
+                      <BeamLoader
+                        shaderOpacity={shaderOpacity}
+                        isModelLoaded={isModelLoaded}
+                        progress={progress}
+                        loaded={loaded}
+                        total={total}
+                      />
+                    </group>
+                    <e.group
+                      position={[0, -1.2, 0]}
+                      theatreKey="MainModelMesh"
+                      ref={modelRef}
+                    >
+                      <ActualModel
+                        LineArtActive={LineArtActive}
+                        setLineArtActive={setLineArtActive}
+                        setMaterialsSetting={setMaterialsSetting}
+                        materialsSetting={materialsSetting}
+                        toggleFanRotation={toggleFanRotation}
+                        fanRotationRef={fanRotationRef}
+                        fanRotationRef2={fanRotationRef2}
+                      />
+                    </e.group>
+                    {/* <ReflectiveBase />  */}
+                  </group>
+                </Center>
+              </Suspense>
+
+              {/* <EffectComposer>
+                <Fluid
+                  fluidColor="#07251e"
+                  blend={0.3}
+                  // backgroundColor="#000000"
+                  showBackground={false}
+                  rgbShiftIntensity={0.03}
+                  intensity={0.1}
+                  force={0.8}
+                  radius={0.7}
+                  pressure={0.9}
+                  densityDissipation={0.91}
+                  distortion={0.3}
+                  velocityDissipation={1.0}
+                  rgbShiftRadius={0.2}
+                  rgbShiftDirection={{ x: 1.0, y: 0.5 }}
+                  blendFunction={BlendFunction.DIFFERENCE}
+                  enableRandomMovement={true}
+                  randomMovementIdleThreshold={200}
+                  // enableBloom={true}
+                />
+              </EffectComposer> */}
+            </SheetProvider>
+          </Canvas>
+          <HeroPopupSequence toggleFanRotation={toggleFanRotation} />
+
+          {isModelLoaded && (
+            <div
+              ref={buttonRef}
+              className="absolute expBtn bottom-15 left-0 w-full h-20 z-[9999] flex items-center justify-center opacity-0"
+            >
+              <SparkleBtn
+                colorTheme="white"
+                onClick={handleClickEnterExperience}
+                children="Enter the Experience"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }

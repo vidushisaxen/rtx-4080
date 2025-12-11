@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo } from "react";
+import React, { Suspense, useEffect, useMemo, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useEnhancedMaterials } from "./MaterialsConfig";
 import { useThree } from "@react-three/fiber";
@@ -7,12 +7,17 @@ import { gsap } from "gsap";
 import * as THREE from "three";
 gsap.registerPlugin(ScrollTrigger);
 import { editable as e } from "@theatre/r3f";
+import { useLineArtEffect } from "./useLineArtEffect";
 
 
-export default function ActualModel({ toggleFanRotation, fanRotationRef, materialsSetting, setMaterialsSetting }) {
+export default function ActualModel({ toggleFanRotation, fanRotationRef, fanRotationRef2, materialsSetting, setMaterialsSetting, LineArtActive, setLineArtActive }) {
   const { nodes, materials } = useGLTF("/assets/models/BeamModel.glb");
   const enhancedMaterials = useEnhancedMaterials(materials);
   const { camera } = useThree();
+  const rootGroupRef = useRef(null);
+  
+  // Use line art effect hook
+  useLineArtEffect(rootGroupRef, nodes, LineArtActive, setLineArtActive);
 
   // Animated material for the metal frame. Cloned from the baked material so
   // it keeps all textures, then tweened to three different looks.
@@ -92,10 +97,12 @@ export default function ActualModel({ toggleFanRotation, fanRotationRef, materia
     };
   }, [camera]);
 
+
   return (
     <Suspense fallback={null}>
       <group dispose={null}>
         <group
+          ref={rootGroupRef}
           scale={0.015}
           position={[0, 0, 0]}
           rotation={[Math.PI / 2, 0, 0]}
@@ -133,7 +140,8 @@ export default function ActualModel({ toggleFanRotation, fanRotationRef, materia
                   </e.group>
 
                   {/* Fan Front */}
-                  <group
+                  <e.group
+                    theatreKey="FanFrontMesh"
                     name="Fan_Front"
                     position={[-9373.76, 2660, 0]}
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -143,6 +151,7 @@ export default function ActualModel({ toggleFanRotation, fanRotationRef, materia
                       name="Fan_Front_main_material_0"
                       castShadow
                       receiveShadow
+                      ref={fanRotationRef2}
                       geometry={nodes.Fan_Front_main_material_0.geometry}
                       material={
                         enhancedMaterials.main_material ||
@@ -151,7 +160,7 @@ export default function ActualModel({ toggleFanRotation, fanRotationRef, materia
                       position={[0, 0, -6.099]}
                       scale={58}
                     />
-                  </group>
+                  </e.group>
 
                   {/* Fan Holders */}
                   <group
